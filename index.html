@@ -3,17 +3,24 @@ async function loadData() {
     let response = await fetch('./data.json');
     let rawData = await response.json();
     
-    // แปลงข้อมูลจาก Google Sheet ให้เข้ากับตารางแดชบอร์ด
-    database = { 'โรงไฟฟ้า 34': { 'รวมเชื้อเพลิง': [] } };
+    // จัดกลุ่มข้อมูลตามโรงไฟฟ้าและประเภทเชื้อเพลิงจากชีตจริง
+    database = {};
     
     rawData.forEach(row => {
+      // ดึงชื่อโรงไฟฟ้าจากคอลัมน์ "โรงไฟฟ้า" (ถ้าไม่มีให้ใช้ค่าเริ่มต้น)
+      let plant = row['โรงไฟฟ้า'] || 'โรงไฟฟ้า 34';
+      let fuel = row['สินค้า'] || 'รวมเชื้อเพลิง';
+      
       let netCv = parseFloat(row['Net CV ARB (kcal/kg)']) || 0;
       let price = parseFloat(row['Price']) || 0;
       let moisture = parseFloat(row['%TM'] || row['ความชื้นจริง(ชิพ)']) || 0;
       let ton = parseFloat(row['นน.สุทธิ']) || 0;
       let bahtMj = netCv > 0 ? parseFloat((price / netCv).toFixed(4)) : 0;
 
-      database['โรงไฟฟ้า 34']['รวมเชื้อเพลิง'].push({
+      if (!database[plant]) database[plant] = {};
+      if (!database[plant][fuel]) database[plant][fuel] = [];
+      
+      database[plant][fuel].push({
         tier: 'B',
         name: row['ชื่อลูกค้า'] || 'ไม่ระบุชื่อ',
         ton: ton,
@@ -28,7 +35,24 @@ async function loadData() {
       });
     });
 
-    switchPlant('โรงไฟฟ้า 34');
+    // สร้างปุ่มเลือกโรงไฟฟ้าอัตโนมัติตามที่มีในข้อมูลจริง
+    const plantTabsContainer = document.getElementById('plantTabs');
+    plantTabsContainer.innerHTML = '';
+    const plants = Object.keys(database);
+    
+    if (plants.length > 0) {
+      currentPlant = plants[0];
+      plants.forEach(p => {
+        let btn = document.createElement('button');
+        btn.className = `plant-tab ${p === currentPlant ? 'active' : ''}`;
+        btn.textContent = `⚡ ${p}`;
+        btn.onclick = () => switchPlant(p);
+        plantTabsContainer.appendChild(btn);
+      });
+      switchPlant(currentPlant);
+    } else {
+      document.getElementById('aiRecommendationText').innerHTML = "⚠️ ไม่พบข้อมูลโรงไฟฟ้าในไฟล์ data.json";
+    }
 
   } catch (error) {
     console.error("ไม่สามารถโหลดไฟล์ data.json ได้:", error);
