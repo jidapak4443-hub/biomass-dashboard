@@ -2,7 +2,6 @@ import csv
 import json
 import urllib.request
 
-# ใส่ลิงก์ Public CSV จาก Google Sheet ของคุณตรงนี้
 CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR5IjxGoHqI63-Us3dGTytWTsQwXINoAJwl2FcwM30ZODBMV1-Fl75_UidNrtyEeABh5qcqoSgumJ2Y/pub?gid=110366739&single=true&output=csv"
 
 def convert_sheet_to_json():
