@@ -19,48 +19,37 @@
   *{box-sizing:border-box;}
   body{margin:0;font-family:'Mitr',sans-serif;background:var(--bg);color:var(--text);padding:16px;}
   .wrap{max-width:1300px;margin:0 auto;}
-
   .ai-advisor-strip{background:linear-gradient(135deg, #1B3B2B, #2C5E43);color:white;border-radius:var(--radius);padding:18px 22px;margin-bottom:16px;box-shadow:var(--shadow);border-left:6px solid #48BB78;}
   .ai-header{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:#9AE6B4;margin-bottom:8px;}
   .ai-body{font-size:14px;line-height:1.5;color:#E2E8F0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
-  .ai-action-btn{background:#48BB78;color:#1A202C;border:none;padding:6px 14px;border-radius:8px;font-family:'Mitr',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:.2s;}
-  .ai-action-btn:hover{background:#68D391;}
-
   .plant-tabs{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
   .plant-tab{flex:1;min-width:140px;padding:12px;border-radius:var(--radius);border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:'Mitr',sans-serif;font-size:14px;font-weight:600;cursor:pointer;text-align:center;transition:.2s;box-shadow:var(--shadow);}
   .plant-tab.active{background:var(--primary-dark);color:white;border-color:var(--primary-dark);}
-
   .filter-bar{display:flex;flex-wrap:wrap;gap:12px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px 18px;margin-bottom:14px;align-items:center;}
   .filter-bar label{font-size:13px;color:var(--muted);}
   .filter-bar input[type="date"]{padding:7px 10px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:'Mitr',sans-serif;font-size:13px;}
   .btn{border:none;padding:7px 14px;border-radius:10px;font-family:'Mitr',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:.2s;}
   .btn-primary{background:var(--primary-dark);color:white;}
   .btn-ghost{background:var(--bg);color:var(--muted);border:1px solid var(--border);}
-
   .fuel-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;}
   .fuel-tab{padding:8px 14px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:'Mitr',sans-serif;font-size:13px;cursor:pointer;white-space:nowrap;transition:.2s;font-weight:500;}
   .fuel-tab.active{background:var(--text);color:white;border-color:var(--text);}
-
   .grid-analytics{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;margin-bottom:14px;}
   @media(max-width:900px){.grid-analytics{grid-template-columns:1fr;}}
   .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;}
   .card h3{margin:0 0 12px;font-size:14px;color:var(--primary-dark);display:flex;align-items:center;gap:6px;}
-
   table{width:100%;border-collapse:collapse;font-size:13px;}
   th{text-align:left;padding:10px;color:var(--muted);font-weight:500;border-bottom:2px solid var(--border);white-space:nowrap;}
   th.num, td.num{text-align:right;}
   td{padding:10px;border-bottom:1px solid var(--border);vertical-align:middle;}
   tr.vendor-row{cursor:pointer;transition:.15s;}
   tr.vendor-row:hover{background:rgba(106,170,120,0.08);}
-  
   .tier-badge{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
   .tier-a{background:#E7F6EA;color:#2F9E52;border:1px solid #2F9E52;}
   .tier-b{background:#EBF3FD;color:#2B6CB0;border:1px solid #2B6CB0;}
   .tier-c{background:#FFF6DC;color:#C9972A;border:1px solid #C9972A;}
   .tier-d{background:#FDEAEA;color:#D9534F;border:1px solid #D9534F;}
-  
   .chart-container{position:relative;height:260px;width:100%;}
-
   .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:100;justify-content:center;align-items:center;padding:16px;}
   .modal-card{background:var(--card);width:100%;max-width:700px;border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,0.15);padding:24px;position:relative;}
   .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
@@ -69,37 +58,21 @@
 </head>
 <body>
 <div class="wrap">
-
   <div class="ai-advisor-strip">
-    <div class="ai-header">
-      🤖 AI Biomass Procurement Advisor: ข้อเสนอแนะเชิงกลยุทธ์ประจำเดือนนี้
-    </div>
-    <div class="ai-body">
-      <span id="aiRecommendationText">💡 กำลังโหลดข้อมูลวิเคราะห์จากระบบ...</span>
-      <button class="ai-action-btn" onclick="alert('ระบบจำลองการปรับแผนจัดซื้อเดือนหน้าเรียบร้อยแล้ว')">📋 ใช้แผนแนะนำนี้</button>
-    </div>
+    <div class="ai-header">🤖 AI Biomass Procurement Advisor: ข้อเสนอแนะเชิงกลยุทธ์</div>
+    <div class="ai-body"><span id="aiRecommendationText">💡 กำลังโหลดข้อมูลวิเคราะห์...</span></div>
   </div>
-
   <div class="plant-tabs" id="plantTabs"></div>
-
   <div class="filter-bar">
-    <div>
-      <label>📅 วิเคราะห์ตั้งแต่:</label>
-      <input type="date" id="startDate" value="2026-09-01">
-    </div>
-    <div>
-      <label>ถึงวันที่:</label>
-      <input type="date" id="endDate" value="2026-10-31">
-    </div>
-    <button class="btn btn-primary" onclick="renderAll()">🔍 ประเมินข้อมูล</button>
+    <div><label>📅 ตั้งแต่:</label><input type="date" id="startDate" value="2026-09-01"></div>
+    <div><label>ถึง:</label><input type="date" id="endDate" value="2026-10-31"></div>
+    <button class="btn btn-primary" onclick="renderAll()">🔍 ประเมิน</button>
     <button class="btn btn-ghost" onclick="resetFilter()">↺ รีเซ็ต</button>
   </div>
-
   <div class="fuel-tabs" id="fuelTabs"></div>
-
   <div class="grid-analytics">
     <div class="card">
-      <h3>📈 Net CV ARB vs. ราคาต่อตัน (Value Analysis)</h3>
+      <h3>📈 Net CV ARB vs. ราคาต่อตัน</h3>
       <div class="chart-container"><canvas id="scatterChart"></canvas></div>
     </div>
     <div class="card">
@@ -107,11 +80,9 @@
       <div id="alertBox" style="font-size:13px;display:flex;flex-direction:column;gap:8px;max-height:240px;overflow-y:auto;"></div>
     </div>
   </div>
-
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-      <h3 style="margin:0;">📋 จัดอันดับและแบ่งเกรดลูกค้า (Vendor Tiering: A / B / C / D)</h3>
-      <span style="font-size:11px;color:var(--muted);">💡 คลิกแถวเพื่อดูประวัติย้อนหลัง</span>
+      <h3 style="margin:0;">📋 จัดอันดับและแบ่งเกรดลูกค้า (Vendor Tiering)</h3>
     </div>
     <div style="overflow-x:auto;">
       <table>
@@ -131,17 +102,6 @@
       </table>
     </div>
   </div>
-
-</div>
-
-<div class="modal-overlay" id="chartModal" onclick="closeModal(event)">
-  <div class="modal-card" onclick="event.stopPropagation()">
-    <div class="modal-header">
-      <h3 id="modalTitle" style="margin:0;color:var(--primary-dark);">📈 ประวัติแนวโน้มย้อนหลัง</h3>
-      <button class="close-btn" onclick="closeModalBtn()">✕</button>
-    </div>
-    <div class="chart-container" style="height:280px;"><canvas id="vendorHistoryChart"></canvas></div>
-  </div>
 </div>
 
 <script>
@@ -149,26 +109,23 @@ let database = {};
 let currentPlant = '';
 let currentFuel = '';
 let scatterChartInstance = null;
-let historyChartInstance = null;
 
 async function loadData() {
   try {
-    let response = await fetch('./data.json');
+    let response = await fetch('data.json?v=' + new Date().getTime()); // ป้องกันติด Cache
     let rawData = await response.json();
     
     database = {};
     
     rawData.forEach(row => {
-      let plantKey = Object.keys(row).find(k => k.trim() === 'โรงไฟฟ้า') || 'โรงไฟฟ้า';
-      let fuelKey = Object.keys(row).find(k => k.trim() === 'สินค้า') || 'สินค้า';
+      let plant = (row['โรงไฟฟ้า'] || row['Plant'] || 'โรงไฟฟ้าหลัก').trim();
+      let fuel = (row['สินค้า'] || row['FuelType'] || 'รวมเชื้อเพลิง').trim();
+      let name = (row['ชื่อลูกค้า'] || row['VendorName'] || 'ไม่ระบุชื่อ').trim();
       
-      let plant = (row[plantKey] || 'ไม่ระบุโรงไฟฟ้า').trim();
-      let fuel = (row[fuelKey] || 'รวมเชื้อเพลิง').trim();
-      
-      let netCv = parseFloat(row['Net CV ARB (kcal/kg)'] || row['Net CV (kcal/kg)']) || 0;
-      let price = parseFloat(row['Price'] || row['ราคา/ตัน']) || 0;
-      let moisture = parseFloat(row['%TM'] || row['ความชื้นจริง(ชิพ)']) || 0;
-      let ton = parseFloat(row['นน.สุทธิ']) || 0;
+      let netCv = parseFloat(row['Net CV ARB (kcal/kg)'] || row['NetCV'] || 0);
+      let price = parseFloat(row['Price'] || row['ราคา/ตัน'] || 0);
+      let moisture = parseFloat(row['%TM'] || row['ความชื้นจริง(ชิพ)'] || row['Moisture'] || 0);
+      let ton = parseFloat(row['นน.สุทธิ'] || row['Ton'] || 0);
       let bahtMj = netCv > 0 ? parseFloat((price / netCv).toFixed(4)) : 0;
 
       if (!database[plant]) database[plant] = {};
@@ -176,7 +133,7 @@ async function loadData() {
       
       database[plant][fuel].push({
         tier: 'B',
-        name: row['ชื่อลูกค้า'] || 'ไม่ระบุชื่อ',
+        name: name,
         ton: ton,
         moisture: moisture,
         netCv: netCv,
@@ -204,12 +161,11 @@ async function loadData() {
       });
       switchPlant(currentPlant);
     } else {
-      document.getElementById('aiRecommendationText').innerHTML = "⚠️ ไม่พบข้อมูลโรงไฟฟ้าในไฟล์ data.json";
+      document.getElementById('aiRecommendationText').innerHTML = "⚠️ ไม่พบข้อมูลในไฟล์ data.json ตรวจสอบชื่อคอลัมน์อีกครั้ง";
     }
-
   } catch (error) {
-    console.error("ไม่สามารถโหลดไฟล์ data.json ได้:", error);
-    document.getElementById('aiRecommendationText').innerHTML = "⚠️ ไม่พบไฟล์ข้อมูล ./data.json กรุณารัน GitHub Action ก่อน";
+    console.error("Error:", error);
+    document.getElementById('aiRecommendationText').innerHTML = "⚠️ โหลดไฟล์ data.json ไม่สำเร็จ";
   }
 }
 
@@ -219,9 +175,7 @@ function switchPlant(plantName) {
     t.classList.remove('active');
     if(t.textContent.includes(plantName)) t.classList.add('active');
   });
-
-  document.getElementById('aiRecommendationText').innerHTML = `💡 กำลังแสดงข้อมูลเชิงกลยุทธ์ของ: ${plantName}`;
-
+  
   const fuels = Object.keys(database[plantName] || {});
   const fuelTabsContainer = document.getElementById('fuelTabs');
   fuelTabsContainer.innerHTML = '';
@@ -236,10 +190,6 @@ function switchPlant(plantName) {
       fuelTabsContainer.appendChild(btn);
     });
     renderAll();
-  } else {
-    currentFuel = '';
-    fuelTabsContainer.innerHTML = '<span style="font-size:13px;color:var(--muted);padding:8px;">ไม่มีข้อมูลเชื้อเพลิงในโรงไฟฟ้านี้</span>';
-    clearAll();
   }
 }
 
@@ -254,130 +204,34 @@ function switchFuel(fuelName) {
 
 function renderAll() {
   const vendors = (database[currentPlant] && database[currentPlant][currentFuel]) || [];
-  
   const tbody = document.getElementById('vendorTableBody');
   tbody.innerHTML = '';
 
   if(vendors.length === 0) {
     tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted);">ไม่พบข้อมูล</td></tr>`;
-    clearAllCharts();
     return;
   }
 
   vendors.sort((a,b) => a.bahtMj - b.bahtMj);
-
-  let alertHTML = '';
-
   vendors.forEach(v => {
-    let varColor = v.variance > 0 ? 'var(--red-text)' : 'var(--green-text)';
-    let varText = (v.variance > 0 ? '+' : '') + v.variance + '%';
-
     let row = document.createElement('tr');
     row.className = 'vendor-row';
-    row.onclick = () => openModal(v);
     row.innerHTML = `
-      <td><span class="tier-badge tier-${v.tier.toLowerCase()}">${v.tier}</span></td>
+      <td><span class="tier-badge tier-b">B</span></td>
       <td><strong>${v.name}</strong></td>
       <td class="num">${v.ton.toLocaleString()}</td>
       <td class="num">${v.moisture}%</td>
       <td class="num">${v.netCv.toLocaleString()}</td>
       <td class="num">${v.price.toLocaleString()}</td>
       <td class="num" style="font-weight:700;">${v.bahtMj}</td>
-      <td style="text-align:center;"><span style="color:${varColor};font-weight:600;">${varText}</span></td>
+      <td style="text-align:center;"><span style="color:var(--green-text);font-weight:600;">0%</span></td>
     `;
     tbody.appendChild(row);
-
-    if(v.alert) {
-      alertHTML += `
-        <div style="background:var(--red-bg);border-left:4px solid var(--red-text);padding:8px 12px;border-radius:6px;color:var(--red-text);">
-          <strong>🚨 ${v.name}:</strong> ${v.alertText}
-        </div>
-      `;
-    }
   });
-
-  if(!alertHTML) {
-    alertHTML = `<div style="background:var(--green-bg);color:var(--green-text);padding:12px;border-radius:8px;text-align:center;">✨ ทุกรายในเชื้อเพลิงนี้ควบคุมต้นทุนได้ตามเป้าหมาย ไม่มีรายการผิดปกติ</div>`;
-  }
-  document.getElementById('alertBox').innerHTML = alertHTML;
-
-  renderScatterChart(vendors);
+  document.getElementById('alertBox'].innerHTML = `<div style="background:var(--green-bg);color:var(--green-text);padding:12px;border-radius:8px;text-align:center;">✨ ระบบดึงข้อมูลสำเร็จ</div>`;
 }
 
-function renderScatterChart(vendors) {
-  const ctx = document.getElementById('scatterChart').getContext('2d');
-  if(scatterChartInstance) scatterChartInstance.destroy();
-
-  const dataPoints = vendors.map(v => ({ x: v.netCv, y: v.price, name: v.name }));
-
-  scatterChartInstance = new Chart(ctx, {
-    type: 'scatter',
-    data: {
-      datasets: [{
-        label: 'ลูกค้ารายตัว (Net CV vs ราคา)',
-        data: dataPoints,
-        backgroundColor: '#4A8B56',
-        pointRadius: 6,
-        pointHoverRadius: 9
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              let pt = context.raw;
-              return `${pt.name}: Net CV ${pt.x} kcal/kg, ราคา ${pt.y} บาท/ตัน`;
-            }
-          }
-        },
-        legend: { display: false }
-      },
-      scales: {
-        x: { title: { display: true, text: 'Net CV ARB (kcal/kg)' } },
-        y: { title: { display: true, text: 'ราคา (บาท/ตัน)' } }
-      }
-    }
-  });
-}
-
-function openModal(vendor) {
-  document.getElementById('modalTitle').textContent = `📈 ประวัติแนวโน้ม Baht/MJ: ${vendor.name} (เกรด ${vendor.tier})`;
-  document.getElementById('chartModal').style.display = 'flex';
-  
-  const ctx = document.getElementById('vendorHistoryChart').getContext('2d');
-  if(historyChartInstance) historyChartInstance.destroy();
-
-  historyChartInstance = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['เดือนที่แล้ว (สัปดาห์ 3)', 'เดือนที่แล้ว (สัปดาห์ 4)', 'เดือนนี้ (ปัจจุบัน)'],
-      datasets: [{
-        label: 'Baht/MJ จริง',
-        data: vendor.history,
-        borderColor: '#4A8B56',
-        backgroundColor: 'rgba(74, 139, 86, 0.1)',
-        borderWidth: 3,
-        fill: true,
-        tension: 0.3
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: { y: { suggestedMin: 0.15, suggestedMax: 0.28 } }
-    }
-  });
-}
-
-function closeModal(e) { if(e.target.id === 'chartModal') closeModalBtn(); }
-function closeModalBtn() { document.getElementById('chartModal').style.display = 'none'; }
-function resetFilter() { document.getElementById('startDate').value = '2026-09-01'; document.getElementById('endDate').value = '2026-10-31'; renderAll(); }
-function clearAll() { clearAllCharts(); document.getElementById('vendorTableBody').innerHTML = ''; }
-function clearAllCharts() { if(scatterChartInstance) scatterChartInstance.destroy(); }
-
+function resetFilter() { renderAll(); }
 loadData();
 </script>
 </body>
