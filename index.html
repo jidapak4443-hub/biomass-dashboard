@@ -248,6 +248,20 @@ async function loadData() {
   }
 }
 
+// ฟังก์ชันช่วยทำความสะอาดและดึงชื่อเชื้อเพลิงให้เป็นตัวหนังสือเสมอ
+function cleanFuelName(val) {
+  if (!val) return 'ไม่ระบุสินค้า';
+  let str = String(val).trim();
+  // ถ้าเป็นตัวเลขล้วน ให้แปลงเป็นชื่อกลาง หรือถ้ามีชื่อข้อความให้ใช้ชื่อนั้น
+  if (!isNaN(str)) {
+    if (str === '1') return 'กะลาปาล์ม';
+    if (str === '2') return 'ไม้วิ่ง';
+    if (str === '3') return 'ไม้สับ';
+    return 'เชื้อเพลิงชนิดที่ ' + str;
+  }
+  return str;
+}
+
 function populateDropdowns() {
   let plants = new Set();
   let fuels = new Set();
@@ -261,13 +275,12 @@ function populateDropdowns() {
     };
 
     let p = String(getVal(['โรงไฟฟ้า', 'Plant'])).trim();
-    // ดึงค่าสินค้าที่เป็นชื่อสินค้า (ตัวหนังสือ) ไม่เอาตัวเลขรหัส
-    let f = String(getVal(['สินค้า', 'Fuel', 'Type', 'ชื่อสินค้า'])).trim();
+    let rawFuel = getVal(['สินค้า', 'Fuel', 'Type', 'ชื่อสินค้า', 'กลุ่มชพ']);
+    let f = cleanFuelName(rawFuel);
     let l = String(getVal(['Logistic', 'ขนส่ง', 'รถ'])).trim();
     
     if(p) plants.add(p);
-    // ตรวจสอบว่าไม่ใช่ตัวเลขล้วน ถึงจะนำมาแสดงเป็นชื่อสินค้า
-    if(f && isNaN(f)) fuels.add(f);
+    if(f && f !== 'ไม่ระบุสินค้า') fuels.add(f);
     if(l) logistics.add(l);
   });
 
@@ -294,7 +307,7 @@ function applyFilters() {
   let endDate = document.getElementById('endDate').value;
 
   let filtered = [];
-  let vendorHistory = {}; // สำหรับเก็บข้อมูลมาวิเคราะห์แนวโน้มความชื้น
+  let vendorHistory = {};
 
   globalRawData.forEach(row => {
     let keys = Object.keys(row);
@@ -304,7 +317,8 @@ function applyFilters() {
     };
 
     let plant = String(getVal(['โรงไฟฟ้า', 'Plant']) || '').trim();
-    let fuel = String(getVal(['สินค้า', 'Fuel', 'Type', 'ชื่อสินค้า'])).trim();
+    let rawFuel = getVal(['สินค้า', 'Fuel', 'Type', 'ชื่อสินค้า', 'กลุ่มชพ']);
+    let fuel = cleanFuelName(rawFuel);
     let name = String(getVal(['ชื่อลูกค้า', 'Vendor', 'Customer', 'Name']) || '').trim();
     let logistic = String(getVal(['Logistic', 'ขนส่ง'])).trim();
     let dateStr = String(getVal(['วันที่ชั่งออก', 'วันที่ชั่ง', 'Date', 'วันที่'])).trim();
@@ -326,15 +340,13 @@ function applyFilters() {
     if (!name) return;
 
     let item = {
-      fuel: fuel || 'ไม่ระบุสินค้า',
-      name, ton, moisture, ash, dust,
+      fuel, name, ton, moisture, ash, dust,
       date: dateStr || '9999-99-99',
       bahtMj: netCv > 0 ? parseFloat((price / netCv).toFixed(3)) : 0
     };
 
     filtered.push(item);
 
-    // เก็บข้อมูลรายชื่อผู้ขายแยกตามวันที่เพื่อเช็คแนวโน้มความชื้น
     if (!vendorHistory[name]) vendorHistory[name] = [];
     vendorHistory[name].push({ date: item.date, moisture });
   });
@@ -354,17 +366,14 @@ function renderDashboard(data, vendorHistory) {
     return;
   }
 
-  // AI วิเคราะห์หาผู้ขายที่มีแนวโน้มความชื้นสูงขึ้น
   let warningHtml = '';
   Object.keys(vendorHistory).forEach(vendor => {
     let records = vendorHistory[vendor];
     if (records.length >= 2) {
-      // เรียงลำดับตามวันที่
       records.sort((a, b) => a.date.localeCompare(b.date));
       let firstM = records[0].moisture;
       let lastM = records[records.length - 1].moisture;
       
-      // ถ้าความชื้นรอบล่าสุดสูงกว่ารอบแรกมากกว่า 3% ถือว่ามีแนวโน้มสูงขึ้น
       if (lastM - firstM >= 3.0) {
         warningHtml += `<div class="alert-item">⚠️ <b>${vendor}</b><br>ความชื้นขยับสูงขึ้น (${firstM.toFixed(1)}% ➔ ${lastM.toFixed(1)}%) ควรเฝ้าระวัง</div>`;
       }
@@ -376,7 +385,6 @@ function renderDashboard(data, vendorHistory) {
   }
   document.getElementById('aiMoistureAlerts').innerHTML = warningHtml;
 
-  // จัดกลุ่มตามสินค้า
   let groups = {};
   data.forEach(item => {
     if (!groups[item.fuel]) groups[item.fuel] = [];
