@@ -51,7 +51,7 @@
     align-items: center;
     border: 1px solid var(--border);
   }
-  .filter-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 160px; position: relative; }
+  .filter-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 170px; position: relative; }
   .filter-bar label { font-size: 12px; color: var(--muted); font-weight: 500; }
   .filter-bar input, .filter-bar select {
     padding: 10px 14px;
@@ -64,7 +64,7 @@
     outline: none;
     transition: 0.2s;
   }
-  .filter-bar input:focus, .filter-bar select:focus {
+  .filter-bar input:focus {
     border-color: var(--primary);
     background: #FFFFFF;
     box-shadow: 0 0 0 4px rgba(138, 182, 138, 0.12);
@@ -95,7 +95,7 @@
     border-radius: 12px;
     box-shadow: var(--shadow);
     z-index: 100;
-    max-height: 200px;
+    max-height: 220px;
     overflow-y: auto;
     padding: 10px;
   }
@@ -165,7 +165,7 @@
 
     <!-- กรองชื่อสินค้าแบบเลือกได้หลายรายการ -->
     <div class="filter-group">
-      <label>🪵 สินค้า (เลือกได้หลายรายการ)</label>
+      <label>🪵 ชื่อสินค้า (เลือกได้หลายรายการ)</label>
       <div class="dropdown-multiselect">
         <div class="select-box" onclick="toggleDropdown()">
           <span id="selectBoxText">-- ทุกสินค้า --</span> 🔽
@@ -179,7 +179,7 @@
       <input type="date" id="startDate" onchange="applyFilters()">
     </div>
     <div class="filter-group">
-      <label>ถึง</label>
+      <label>ถึงวันที่ชั่งออก</label>
       <input type="date" id="endDate" onchange="applyFilters()">
     </div>
     <div class="filter-group">
@@ -282,7 +282,8 @@ function toggleDropdown() {
 
 window.onclick = function(event) {
   if (!event.target.closest('.dropdown-multiselect')) {
-    document.getElementById('fuelCheckboxContainer').style.display = 'none';
+    let dropdown = document.getElementById('fuelCheckboxContainer');
+    if(dropdown) dropdown.style.display = 'none';
   }
 }
 
@@ -320,14 +321,15 @@ function applyFilters() {
   globalRawData.forEach(row => {
     let keys = Object.keys(row);
     let getVal = (kws) => {
-      let found = keys.find(k => kws.some(kw => kws.some(kw2 => k.trim().toLowerCase().includes(kw2.toLowerCase()))));
+      let found = keys.find(k => kws.some(kw => k.trim().toLowerCase().includes(kw.toLowerCase())));
       return found ? row[found] : '';
     };
 
-    // ค้นหาคีย์ที่มีคำว่า วันที่ชั่งออก หรือ วันที่
     let plant = String(getVal(['โรงไฟฟ้า', 'Plant']) || 'โรงไฟฟ้าหลัก').trim();
     let fuel = String(getVal(['สินค้า', 'Fuel', 'Type']) || 'รวมเชื้อเพลิง').trim();
     let name = String(getVal(['ชื่อลูกค้า', 'Vendor', 'Customer', 'Name']) || 'ไม่ระบุชื่อ').trim();
+    
+    // ดึงค่าวันที่ชั่งออก
     let dateStr = String(getVal(['วันที่ชั่งออก', 'วันที่ชั่ง', 'Date', 'วันที่'])).trim();
 
     if (selPlant && plant !== selPlant) return;
@@ -345,8 +347,9 @@ function applyFilters() {
 
     if (!name) return;
 
-    // ถ้าผู้ใช้ไม่ได้เลือกเจาะจงสินค้าเดี่ยวๆ (หรือเลือกหลายสินค้า) จะทำการแยกประเภทสินค้าในตาราง
-    let groupKey = (selectedFuels.length !== 1) ? `${name}_${fuel}` : name;
+    // หากเลือกสินค้ามากกว่า 1 รายการ หรือเลือกทั้งหมด จะแยกแถวตามชื่อลูกค้าและประเภทสินค้า
+    let isMultiFuelSelected = selectedFuels.length !== 1;
+    let groupKey = isMultiFuelSelected ? `${name}_${fuel}` : name;
 
     if (!grouped[groupKey]) {
       grouped[groupKey] = { plant, fuel, name, totalTon: 0, sumMoisture: 0, sumAsh: 0, sumDust: 0, sumNetCv: 0, sumPrice: 0, count: 0 };
@@ -462,7 +465,8 @@ function renderChart(vendors) {
 function resetFilter() {
   document.getElementById('filterPlant').value = '';
   document.querySelectorAll('.fuel-checkbox').forEach(cb => cb.checked = true);
-  document.getElementById('selectAllFuels').checked = true;
+  let selectAll = document.getElementById('selectAllFuels');
+  if(selectAll) selectAll.checked = true;
   updateFuelSelectText();
   document.getElementById('filterCustomer').value = '';
   document.getElementById('startDate').value = '';
