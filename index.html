@@ -3,281 +3,249 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌱 Biomass Command Center & AI Advisor</title>
+<title>Fuel Quality Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   :root {
-    --bg: #F4F8F5;
+    --bg: #F5F9F6;
     --card: #FFFFFF;
-    --primary: #5C8D73;
-    --primary-dark: #3B5E4C;
-    --primary-light: #E8F2EC;
-    --accent: #E0A96D;
+    --primary: #4A7C59;
+    --primary-light: #EBF3ED;
     --text: #2C3E35;
-    --muted: #7A8C82;
-    --border: #E1EBE4;
-    --radius: 18px;
-    --shadow: 0 8px 24px rgba(92, 141, 115, 0.08);
+    --muted: #7E8F84;
+    --border: #D8E4DC;
+    --radius: 14px;
+    --shadow: 0 4px 20px rgba(74, 124, 89, 0.05);
   }
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: 'Mitr', sans-serif; background: var(--bg); color: var(--text); padding: 24px; }
-  .wrap { max-width: 1350px; margin: 0 auto; }
-  
-  /* Header สไตล์ Dashboard พรีเมียมพาสเทล */
-  .dashboard-header {
+  body { margin: 0; font-family: 'Mitr', sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+  .wrap { max-width: 1400px; margin: 0 auto; }
+
+  /* Header สไตล์พรีเมียม */
+  .top-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: var(--card);
-    padding: 20px 28px;
+    padding: 16px 24px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     border: 1px solid var(--border);
   }
-  .brand-area { display: flex; align-items: center; gap: 14px; }
-  .brand-icon { font-size: 32px; background: var(--primary-light); width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
-  .brand-text h1 { margin: 0; font-size: 20px; color: var(--primary-dark); font-weight: 600; }
-  .brand-text p { margin: 2px 0 0 0; font-size: 13px; color: var(--muted); }
+  .brand-title { display: flex; align-items: baseline; gap: 12px; }
+  .brand-title h1 { margin: 0; font-size: 22px; color: var(--text); font-weight: 600; }
+  .brand-title h1 span { color: var(--primary); }
+  .brand-title p { margin: 0; font-size: 13px; color: var(--muted); border-left: 2px solid var(--border); padding-left: 12px; }
+  
+  .update-badge {
+    background: #F0F4F1;
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+  }
+  .update-badge b { color: var(--text); display: block; font-size: 13px; }
 
-  /* AI Banner อบอุ่นละมุนตา */
-  .ai-advisor-strip {
-    background: linear-gradient(135deg, #EBF5F0, #D9EFE3);
-    color: #2D523F;
+  /* Filter Bar แถบบนสุด */
+  .filter-bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    background: var(--card);
+    padding: 14px 18px;
     border-radius: var(--radius);
-    padding: 18px 24px;
-    margin-bottom: 20px;
     box-shadow: var(--shadow);
-    border: 1px solid #C8E6D4;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+  }
+  .filter-item {
     display: flex;
     align-items: center;
+    gap: 8px;
+    background: #FAFCFB;
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .filter-item select, .filter-item input {
+    border: none;
+    background: transparent;
+    font-family: 'Mitr', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    width: 100%;
+    outline: none;
+  }
+
+  /* Main Layout: ซ้าย Card สรุป / ขวา ตารางหลัก */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
     gap: 16px;
   }
-  .ai-avatar { font-size: 30px; background: white; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.04); flex-shrink: 0; }
-  .ai-content h4 { margin: 0 0 4px 0; font-size: 14px; color: #234533; font-weight: 600; }
-  .ai-content p { margin: 0; font-size: 13px; line-height: 1.5; color: #3E6B53; }
+  @media(max-width: 1000px) { .main-grid { grid-template-columns: 1fr; } }
 
-  /* Filter Bar คุมโทนสะอาดตา */
-  .filter-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
+  /* Left Cards สรุปค่าเฉลี่ย */
+  .left-cards { display: flex; flex-direction: column; gap: 12px; }
+  .stat-card {
     background: var(--card);
     border-radius: var(--radius);
+    padding: 16px 20px;
     box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::after {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--primary);
+  }
+  .stat-card h4 { margin: 0 0 6px 0; font-size: 13px; color: var(--muted); font-weight: 500; display: flex; align-items: center; gap: 6px; }
+  .stat-value { font-size: 26px; font-weight: 600; color: var(--text); }
+  .stat-value span { font-size: 15px; font-weight: 500; color: var(--muted); }
+
+  /* Right Table Card */
+  .table-card {
+    background: var(--card);
+    border-radius: var(--radius);
     padding: 20px;
-    margin-bottom: 20px;
-    align-items: center;
-    border: 1px solid var(--border);
-  }
-  .filter-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 170px; position: relative; }
-  .filter-bar label { font-size: 12px; color: var(--muted); font-weight: 500; }
-  .filter-bar input, .filter-bar select {
-    padding: 10px 14px;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    background: #FAFCFA;
-    color: var(--text);
-    font-family: 'Mitr', sans-serif;
-    font-size: 13px;
-    outline: none;
-    transition: 0.2s;
-  }
-  .filter-bar input:focus {
-    border-color: var(--primary);
-    background: #FFFFFF;
-    box-shadow: 0 0 0 4px rgba(92, 141, 115, 0.1);
-  }
-  
-  /* Dropdown หลายตัวเลือกสำหรับสินค้า */
-  .dropdown-multiselect { position: relative; }
-  .select-box {
-    padding: 10px 14px;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    background: #FAFCFA;
-    font-size: 13px;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--text);
-  }
-  .checkbox-dropdown-content {
-    display: none;
-    position: absolute;
-    top: 105%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 12px;
     box-shadow: var(--shadow);
-    z-index: 100;
-    max-height: 220px;
-    overflow-y: auto;
-    padding: 10px;
-  }
-  .checkbox-dropdown-content label { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 6px; cursor: pointer; color: var(--text); }
-  .checkbox-dropdown-content label:hover { background: #F0F7F3; border-radius: 8px; }
-
-  .filter-actions { display: flex; gap: 8px; align-self: flex-end; }
-  .btn {
-    border: none;
-    padding: 10px 20px;
-    border-radius: 12px;
-    font-family: 'Mitr', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: 0.2s;
-    height: 42px;
-  }
-  .btn-primary { background: var(--primary); color: white; }
-  .btn-primary:hover { background: var(--primary-dark); }
-  .btn-ghost { background: #F0F4F1; color: var(--muted); }
-  .btn-ghost:hover { background: #E1EBE4; color: var(--text); }
-
-  .grid-analytics { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; margin-bottom: 20px; }
-  @media(max-width: 900px) { .grid-analytics { grid-template-columns: 1fr; } }
-  
-  .card {
-    background: var(--card);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 24px;
     border: 1px solid var(--border);
   }
-  .card h3 { margin: 0 0 16px; font-size: 15px; color: var(--primary-dark); display: flex; align-items: center; gap: 8px; font-weight: 600; }
+  .table-card h3 { margin: 0 0 14px 0; font-size: 16px; color: var(--text); font-weight: 600; display: flex; align-items: center; gap: 8px; }
   
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th { text-align: left; padding: 14px 12px; color: var(--muted); font-weight: 500; border-bottom: 2px solid var(--border); white-space: nowrap; background: #FAFCFA; }
+  th { text-align: left; padding: 12px 10px; color: var(--muted); font-weight: 500; border-bottom: 2px solid var(--border); background: #FAFCFB; white-space: nowrap; }
   th.num, td.num { text-align: right; }
-  td { padding: 14px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-  tr.vendor-row:hover { background: #F4F8F5; }
+  td { padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
   
-  .tier-badge { width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
-  .tier-a { background: #E2F0D9; color: #385723; }
-  .tier-b { background: #D9E1F2; color: #1F3864; }
-  .tier-c { background: #FFF2CC; color: #7F6000; }
-  .tier-d { background: #FCE4D6; color: #C65911; }
-
-  .chart-container { position: relative; height: 260px; width: 100%; }
+  tr.group-header td { background: #F8FBF9; font-weight: 600; color: var(--primary); border-top: 1px solid var(--border); }
+  tr.sub-total td { background: #FAFCFB; font-weight: 600; color: var(--text); border-bottom: 2px solid var(--border); }
+  
+  /* Baht/MJ Highlight status */
+  .badge-green { background: #E2F0D9; color: #385723; padding: 4px 10px; border-radius: 6px; font-weight: 600; display: inline-block; text-align: right; }
+  .badge-red { background: #FCE4D6; color: #C65911; padding: 4px 10px; border-radius: 6px; font-weight: 600; display: inline-block; text-align: right; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <!-- Header จำลองหน้าแดชบอร์ดพรีเมียม -->
-  <div class="dashboard-header">
-    <div class="brand-area">
-      <div class="brand-icon">🏭🌴</div>
-      <div class="brand-text">
-        <h1>Biomass Command Center</h1>
-        <p>ระบบติดตามและประเมินคุณภาพเชื้อเพลิงโรงไฟฟ้า</p>
-      </div>
+  
+  <!-- Header -->
+  <div class="top-header">
+    <div class="brand-title">
+      <h1>Fuel Quality <span>Dashboard</span></h1>
+      <p>อัปเดตคุณภาพเชื้อเพลิงโรงไฟฟ้า (รายวัน) <span id="dateRangeInfo"></span></p>
     </div>
-    <div style="font-size:13px; color:var(--muted); background:var(--bg); padding:8px 16px; border-radius:12px; border:1px solid var(--border);">
-      🟢 ระบบเชื่อมต่อข้อมูล Real-time
-    </div>
-  </div>
-
-  <div class="ai-advisor-strip">
-    <div class="ai-avatar">👨‍🌾🤖</div>
-    <div class="ai-content">
-      <h4>AI Biomass Procurement Advisor</h4>
-      <p id="aiRecommendationText">💡 กำลังวิเคราะห์ข้อมูลและประเมินความคุ้มค่า...</p>
+    <div class="update-badge">
+      อัปเดตล่าสุด
+      <b id="lastUpdateTime">-</b>
     </div>
   </div>
 
-  <!-- แถบตัวกรอง (Filter Bar) -->
+  <!-- Filter Bar -->
   <div class="filter-bar">
-    <div class="filter-group">
-      <label>⚡ โรงไฟฟ้า</label>
-      <select id="filterPlant" onchange="applyFilters()"><option value="">-- ทุกโรงไฟฟ้า --</option></select>
+    <div class="filter-item">
+      <span>🏭</span>
+      <select id="filterPlant" onchange="applyFilters()"><option value="">โรงไฟฟ้าทั้งหมด</option></select>
     </div>
+    <div class="filter-item">
+      <span>🪵</span>
+      <select id="filterFuel" onchange="applyFilters()"><option value="">สินค้าทั้งหมด</option></select>
+    </div>
+    <div class="filter-item">
+      <span>🚛</span>
+      <select id="filterLogistic" onchange="applyFilters()"><option value="">Logistic ทั้งหมด</option></select>
+    </div>
+    <div class="filter-item">
+      <span>👥</span>
+      <input type="text" id="filterCustomer" placeholder="ค้นหาชื่อลูกค้า..." oninput="applyFilters()">
+    </div>
+    <div class="filter-item">
+      <span>📅</span>
+      <input type="date" id="startDate" onchange="applyFilters()" style="width:45%"> - 
+      <input type="date" id="endDate" onchange="applyFilters()" style="width:45%">
+    </div>
+  </div>
 
-    <!-- กรองชื่อสินค้าแบบเลือกได้หลายรายการ -->
-    <div class="filter-group">
-      <label>🪵 ชื่อสินค้า (เลือกได้หลายรายการ)</label>
-      <div class="dropdown-multiselect">
-        <div class="select-box" onclick="toggleDropdown()">
-          <span id="selectBoxText">-- ทุกสินค้า --</span> 🔽
-        </div>
-        <div class="checkbox-dropdown-content" id="fuelCheckboxContainer"></div>
+  <!-- Main Content Grid -->
+  <div class="main-grid">
+    
+    <!-- Left Stats -->
+    <div class="left-cards">
+      <div class="stat-card">
+        <h4>💧 ความชื้นเฉลี่ย (%TM)</h4>
+        <div class="stat-value" id="avgMoisture">0.00 <span>%</span></div>
+      </div>
+      <div class="stat-card">
+        <h4>🪙 Baht/MJ เฉลี่ย</h4>
+        <div class="stat-value" id="avgBahtMj">0.000</div>
+      </div>
+      <div class="stat-card">
+        <h4>🌋 ขี้เถ้าเฉลี่ย (%Ash)</h4>
+        <div class="stat-value" id="avgAsh">0.00 <span>%</span></div>
+      </div>
+      <!-- ตัวการ์ตูนตกแต่งน่ารักๆ มินิมอล -->
+      <div style="text-align:center; padding:15px; background:var(--card); border-radius:var(--radius); border:1px solid var(--border); box-shadow:var(--shadow);">
+        <span style="font-size:36px;">🌱🦊⚡</span>
+        <p style="margin:6px 0 0 0; font-size:12px; color:var(--muted);">Biomass Smart Analytics</p>
       </div>
     </div>
 
-    <div class="filter-group">
-      <label>📅 วันที่ชั่งออก (ตั้งแต่)</label>
-      <input type="date" id="startDate" onchange="applyFilters()">
+    <!-- Right Table -->
+    <div class="table-card">
+      <h3>📋 คุณภาพเชื้อเพลิง</h3>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>กลุ่มชพ.</th>
+              <th>ชื่อลูกค้า</th>
+              <th class="num">Ton</th>
+              <th class="num">%TM by weight</th>
+              <th class="num">Ash</th>
+              <th class="num">ฝุ่นแกลบ</th>
+              <th class="num">Baht/MJ act</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- Data will be injected here -->
+          </tbody>
+        </table>
+      </div>
     </div>
-    <div class="filter-group">
-      <label>ถึงวันที่ชั่งออก</label>
-      <input type="date" id="endDate" onchange="applyFilters()">
-    </div>
-    <div class="filter-group">
-      <label>🔍 ค้นหาลูกค้า</label>
-      <input type="text" id="filterCustomer" placeholder="พิมพ์ชื่อลูกค้า..." oninput="applyFilters()">
-    </div>
-    <div class="filter-actions">
-      <button class="btn btn-primary" onclick="applyFilters()">กรอง</button>
-      <button class="btn btn-ghost" onclick="resetFilter()">รีเซ็ต</button>
-    </div>
-  </div>
 
-  <div class="grid-analytics">
-    <div class="card">
-      <h3>📊 เปรียบเทียบต้นทุนพลังงาน (Baht/MJ)</h3>
-      <div class="chart-container"><canvas id="barChart"></canvas></div>
-    </div>
-    <div class="card">
-      <h3>🔔 Smart Alert & สรุปสถานะ</h3>
-      <div id="alertBox" style="font-size:13px;display:flex;flex-direction:column;gap:8px;max-height:240px;overflow-y:auto;"></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>📋 รายงานการจัดซื้อและคุณภาพเชื้อเพลิง (Vendor Evaluation)</h3>
-    <div style="overflow-x:auto;">
-      <table>
-        <thead>
-          <tr>
-            <th style="width:50px;">เกรด</th>
-            <th>ชื่อลูกค้า / ผู้จัดจำหน่าย</th>
-            <th class="num">น้ำหนักรวม (Ton)</th>
-            <th class="num">ความชื้น (%)</th>
-            <th class="num">%Ash</th>
-            <th class="num">ฝุ่นแกลบ</th>
-            <th class="num">ราคา/ตัน</th>
-            <th class="num">Baht/MJ</th>
-          </tr>
-        </thead>
-        <tbody id="vendorTableBody"></tbody>
-      </table>
-    </div>
   </div>
 </div>
 
 <script>
 let globalRawData = [];
-let chartInstance = null;
 
 async function loadData() {
   try {
     let response = await fetch('./data.json?v=' + new Date().getTime());
     globalRawData = await response.json();
+    
+    // แสดงเวลาปัจจุบันที่โหลด
+    let now = new Date();
+    document.getElementById('lastUpdateTime').textContent = now.toLocaleDateString('th-TH', {year:'numeric', month:'short', day:'numeric'}) + ' ' + now.toLocaleTimeString();
+
     populateDropdowns();
     applyFilters();
   } catch (error) {
-    console.error("Error:", error);
-    document.getElementById('aiRecommendationText').innerHTML = "⚠️ ไม่สามารถโหลดไฟล์ข้อมูลได้";
+    console.error("Error loading data:", error);
   }
 }
 
 function populateDropdowns() {
   let plants = new Set();
   let fuels = new Set();
+  let logistics = new Set();
 
   globalRawData.forEach(row => {
     let keys = Object.keys(row);
@@ -288,69 +256,36 @@ function populateDropdowns() {
 
     let p = String(getVal(['โรงไฟฟ้า', 'Plant'])).trim();
     let f = String(getVal(['สินค้า', 'Fuel', 'Type'])).trim();
+    let l = String(getVal(['Logistic', 'ขนส่ง', 'รถ'])).trim();
+    
     if(p) plants.add(p);
     if(f) fuels.add(f);
+    if(l) logistics.add(l);
   });
 
-  let plantSelect = document.getElementById('filterPlant');
-  plants.forEach(p => {
-    let opt = document.createElement('option');
-    opt.value = p; opt.textContent = p;
-    plantSelect.appendChild(opt);
-  });
+  let fillSelect = (id, setVal) => {
+    let sel = document.getElementById(id);
+    setVal.forEach(val => {
+      let opt = document.createElement('option');
+      opt.value = val; opt.textContent = val;
+      sel.appendChild(opt);
+    });
+  };
 
-  let fuelContainer = document.getElementById('fuelCheckboxContainer');
-  fuelContainer.innerHTML = `<label><input type="checkbox" id="selectAllFuels" checked onchange="toggleSelectAllFuels(this)"> -- เลือกทั้งหมด --</label>`;
-  
-  fuels.forEach(f => {
-    let lbl = document.createElement('label');
-    lbl.innerHTML = `<input type="checkbox" value="${f}" class="fuel-checkbox" checked onchange="updateFuelSelectText()"> ${f}`;
-    fuelContainer.appendChild(lbl);
-  });
-}
-
-function toggleDropdown() {
-  let content = document.getElementById('fuelCheckboxContainer');
-  content.style.display = content.style.display === 'block' ? 'none' : 'block';
-}
-
-window.onclick = function(event) {
-  if (!event.target.closest('.dropdown-multiselect')) {
-    let dropdown = document.getElementById('fuelCheckboxContainer');
-    if(dropdown) dropdown.style.display = 'none';
-  }
-}
-
-function toggleSelectAllFuels(master) {
-  let checkboxes = document.querySelectorAll('.fuel-checkbox');
-  checkboxes.forEach(cb => cb.checked = master.checked);
-  updateFuelSelectText();
-  applyFilters();
-}
-
-function updateFuelSelectText() {
-  let checkboxes = document.querySelectorAll('.fuel-checkbox');
-  let checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
-  let textSpan = document.getElementById('selectBoxText');
-  
-  if (checkedCount === 0) textSpan.textContent = '-- ไม่ได้เลือกสินค้า --';
-  else if (checkedCount === checkboxes.length) textSpan.textContent = '-- ทุกสินค้า --';
-  else textSpan.textContent = `เลือกแล้ว (${checkedCount} สินค้า)`;
-  
-  applyFilters();
+  fillSelect('filterPlant', plants);
+  fillSelect('filterFuel', fuels);
+  fillSelect('filterLogistic', logistics);
 }
 
 function applyFilters() {
   let selPlant = document.getElementById('filterPlant').value;
+  let selFuel = document.getElementById('filterFuel').value;
+  let selLogistic = document.getElementById('filterLogistic').value;
   let searchCust = document.getElementById('filterCustomer').value.toLowerCase();
   let startDate = document.getElementById('startDate').value;
   let endDate = document.getElementById('endDate').value;
 
-  let selectedFuels = Array.from(document.querySelectorAll('.fuel-checkbox'))
-                      .filter(cb => cb.checked)
-                      .map(cb => cb.value);
-
-  let grouped = {};
+  let filtered = [];
 
   globalRawData.forEach(row => {
     let keys = Object.keys(row);
@@ -359,13 +294,15 @@ function applyFilters() {
       return found ? row[found] : '';
     };
 
-    let plant = String(getVal(['โรงไฟฟ้า', 'Plant']) || 'โรงไฟฟ้าหลัก').trim();
-    let fuel = String(getVal(['สินค้า', 'Fuel', 'Type']) || 'รวมเชื้อเพลิง').trim();
-    let name = String(getVal(['ชื่อลูกค้า', 'Vendor', 'Customer', 'Name']) || 'ไม่ระบุชื่อ').trim();
+    let plant = String(getVal(['โรงไฟฟ้า', 'Plant']) || '').trim();
+    let fuel = String(getVal(['สินค้า', 'Fuel', 'Type']) || 'ไม่ระบุสินค้า').trim();
+    let name = String(getVal(['ชื่อลูกค้า', 'Vendor', 'Customer', 'Name']) || '').trim();
+    let logistic = String(getVal(['Logistic', 'ขนส่ง'])).trim();
     let dateStr = String(getVal(['วันที่ชั่งออก', 'วันที่ชั่ง', 'Date', 'วันที่'])).trim();
 
     if (selPlant && plant !== selPlant) return;
-    if (selectedFuels.length > 0 && !selectedFuels.includes(fuel)) return;
+    if (selFuel && fuel !== selFuel) return;
+    if (selLogistic && logistic !== selLogistic) return;
     if (searchCust && !name.toLowerCase().includes(searchCust)) return;
     if (startDate && dateStr && dateStr < startDate) return;
     if (endDate && dateStr && dateStr > endDate) return;
@@ -379,130 +316,87 @@ function applyFilters() {
 
     if (!name) return;
 
-    let isMultiFuelSelected = selectedFuels.length !== 1;
-    let groupKey = isMultiFuelSelected ? `${name}_${fuel}` : name;
-
-    if (!grouped[groupKey]) {
-      grouped[groupKey] = { plant, fuel, name, totalTon: 0, sumMoisture: 0, sumAsh: 0, sumDust: 0, sumNetCv: 0, sumPrice: 0, count: 0 };
-    }
-
-    let g = grouped[groupKey];
-    g.totalTon += ton;
-    g.sumMoisture += moisture;
-    g.sumAsh += ash;
-    g.sumDust += dust;
-    g.sumNetCv += netCv;
-    g.sumPrice += price;
-    g.count += 1;
+    filtered.push({
+      fuel, name, ton, moisture, ash, dust,
+      bahtMj: netCv > 0 ? parseFloat((price / netCv).toFixed(3)) : 0
+    });
   });
 
-  let vendors = Object.values(grouped).map(item => {
-    let cnt = item.count;
-    let avgNetCv = cnt > 0 ? item.sumNetCv / cnt : 0;
-    let avgPrice = cnt > 0 ? item.sumPrice / cnt : 0;
-    let bahtMj = avgNetCv > 0 ? parseFloat((avgPrice / avgNetCv).toFixed(3)) : 0;
-
-    return {
-      plant: item.plant,
-      fuel: item.fuel,
-      name: item.name,
-      ton: item.totalTon,
-      moisture: cnt > 0 ? (item.sumMoisture / cnt).toFixed(2) : 0,
-      ash: cnt > 0 ? (item.sumAsh / cnt).toFixed(2) : 0,
-      dust: cnt > 0 ? (item.sumDust / cnt).toFixed(2) : 0,
-      price: Math.round(avgPrice),
-      bahtMj: bahtMj,
-      tier: 'B'
-    };
-  });
-
-  renderTableAndChart(vendors, selectedFuels.length !== 1);
+  renderDashboard(filtered);
 }
 
-function renderTableAndChart(vendors, isGroupedByFuel) {
-  const tbody = document.getElementById('vendorTableBody');
+function renderDashboard(data) {
+  let tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
 
-  if(vendors.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted);">🌱 ไม่พบข้อมูลตามเงื่อนไขที่เลือก</td></tr>`;
-    document.getElementById('alertBox').innerHTML = `<div style="color:var(--muted);text-align:center;">ไม่มีข้อมูลแจ้งเตือน</div>`;
-    document.getElementById('aiRecommendationText').innerHTML = `💡 ลองปรับเปลี่ยนเงื่อนไขการกรองข้อมูลใหม่อีกครั้งนะครับ`;
-    if(chartInstance) chartInstance.destroy();
+  if (data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted);">🌱 ไม่พบข้อมูลตามเงื่อนไขที่เลือก</td></tr>`;
+    document.getElementById('avgMoisture').innerHTML = `0.00 <span>%</span>`;
+    document.getElementById('avgBahtMj').textContent = `0.000`;
+    document.getElementById('avgAsh').innerHTML = `0.00 <span>%</span>`;
     return;
   }
 
-  vendors.sort((a,b) => a.bahtMj - b.bahtMj);
-  let totalB = vendors.reduce((sum, v) => sum + v.bahtMj, 0);
-  let avgBahtMj = totalB / vendors.length;
+  // จัดกลุ่มตามสินค้า (Fuel Grouping)
+  let groups = {};
+  data.forEach(item => {
+    if (!groups[item.fuel]) groups[item.fuel] = [];
+    groups[item.fuel].push(item);
+  });
 
-  vendors.forEach((v, index) => {
-    if(index === 0) v.tier = 'A';
-    else if(v.bahtMj <= avgBahtMj * 1.05) v.tier = 'B';
-    else if(v.bahtMj <= avgBahtMj * 1.15) v.tier = 'C';
-    else v.tier = 'D';
+  let totalTonAll = 0, sumMoistureAll = 0, sumBahtAll = 0, sumAshAll = 0, countAll = 0;
 
-    let displayName = isGroupedByFuel ? `${v.name} <span style="font-size:11px;color:var(--primary-dark);background:var(--primary-light);padding:2px 6px;border-radius:6px;margin-left:4px;">${v.fuel}</span>` : v.name;
+  Object.keys(groups).forEach(fuelName => {
+    let items = groups[fuelName];
+    let groupTon = items.reduce((sum, i) => sum + i.ton, 0);
+    let groupMoisture = items.reduce((sum, i) => sum + i.moisture, 0) / items.length;
+    let groupAsh = items.reduce((sum, i) => sum + i.ash, 0) / items.length;
+    let groupDust = items.reduce((sum, i) => sum + i.dust, 0) / items.length;
+    let groupBaht = items.reduce((sum, i) => sum + i.bahtMj, 0) / items.length;
 
-    let row = document.createElement('tr');
-    row.className = 'vendor-row';
-    row.innerHTML = `
-      <td><span class="tier-badge tier-${v.tier.toLowerCase()}">${v.tier}</span></td>
-      <td><strong>${displayName}</strong></td>
-      <td class="num">${v.ton.toLocaleString()}</td>
-      <td class="num">${v.moisture}%</td>
-      <td class="num">${v.ash}%</td>
-      <td class="num">${v.dust}</td>
-      <td class="num">${v.price.toLocaleString()}</td>
-      <td class="num" style="font-weight:600;color:var(--primary-dark);">${v.bahtMj.toFixed(3)}</td>
+    totalTonAll += groupTon;
+    sumMoistureAll += groupMoisture;
+    sumBahtAll += groupBaht;
+    sumAshAll += groupAsh;
+    countAll++;
+
+    // พิมพ์รายการลูกค้าย่อย
+    items.forEach((item, idx) => {
+      let badgeClass = item.bahtMj > 0.150 ? 'badge-red' : 'badge-green'; // เกณฑ์สีเตือน
+      let row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${idx === 0 ? '<b>' + fuelName + '</b>' : ''}</td>
+        <td>${item.name}</td>
+        <td class="num">${item.ton.toLocaleString()}</td>
+        <td class="num">${item.moisture.toFixed(2)}</td>
+        <td class="num">${item.ash.toFixed(2)}</td>
+        <td class="num">${item.dust.toFixed(2)}</td>
+        <td class="num"><span class="${badgeClass}">${item.bahtMj.toFixed(3)}</span></td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    // แถวสรุป (รวม) ประจำกลุ่มสินค้า
+    let subRow = document.createElement('tr');
+    subRow.className = 'sub-total';
+    subRow.innerHTML = `
+      <td>รวม</td>
+      <td>-</td>
+      <td class="num">${groupTon.toLocaleString()}</td>
+      <td class="num">${groupMoisture.toFixed(2)}</td>
+      <td class="num">${groupAsh.toFixed(2)}</td>
+      <td class="num">${groupDust.toFixed(2)}</td>
+      <td class="num">${groupBaht.toFixed(3)}</td>
     `;
-    tbody.appendChild(row);
+    tbody.appendChild(subRow);
   });
 
-  document.getElementById('aiRecommendationText').innerHTML = `ผู้จัดจำหน่ายที่คุ้มค่าที่สุดในกลุ่มนี้คือ <b>${vendors[0].name}</b> (${vendors[0].fuel}) ด้วยต้นทุนประหยัดเพียง <b>${vendors[0].bahtMj.toFixed(3)} Baht/MJ</b> ครับ!`;
-  document.getElementById('alertBox').innerHTML = `<div style="background:#E8F2EC;color:#3B5E4C;padding:12px 16px;border-radius:12px;font-weight:500;">✨ ประมวลผลสำเร็จ ${vendors.length} รายการ</div>`;
-
-  renderChart(vendors);
-}
-
-function renderChart(vendors) {
-  const ctx = document.getElementById('barChart').getContext('2d');
-  if(chartInstance) chartInstance.destroy();
-
-  let topVendors = vendors.slice(0, 10);
-
-  chartInstance = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: topVendors.map(v => v.name + (v.fuel ? ` (${v.fuel})` : '')),
-      datasets: [{
-        label: 'Baht/MJ',
-        data: topVendors.map(v => v.bahtMj),
-        backgroundColor: '#5C8D73',
-        borderRadius: 8
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        y: { beginAtZero: true, grid: { color: '#F0F5F2' } },
-        x: { grid: { display: false }, ticks: { font: { size: 11, family: 'Mitr' } } }
-      }
-    }
-  });
-}
-
-function resetFilter() {
-  document.getElementById('filterPlant').value = '';
-  document.querySelectorAll('.fuel-checkbox').forEach(cb => cb.checked = true);
-  let selectAll = document.getElementById('selectAllFuels');
-  if(selectAll) selectAll.checked = true;
-  updateFuelSelectText();
-  document.getElementById('filterCustomer').value = '';
-  document.getElementById('startDate').value = '';
-  document.getElementById('endDate').value = '';
-  applyFilters();
+  // อัปเดต Card ด้านซ้าย
+  if (countAll > 0) {
+    document.getElementById('avgMoisture').innerHTML = `${(sumMoistureAll / countAll).toFixed(2)} <span>%</span>`;
+    document.getElementById('avgBahtMj').textContent = (sumBahtAll / countAll).toFixed(3);
+    document.getElementById('avgAsh').innerHTML = `${(sumAshAll / countAll).toFixed(2)} <span>%</span>`;
+  }
 }
 
 loadData();
