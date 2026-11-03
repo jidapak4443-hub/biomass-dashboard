@@ -248,9 +248,7 @@ async function loadData() {
   }
 }
 
-// ฟังก์ชันดึงค่าชื่อสินค้า/กลุ่มเชื้อเพลิงให้แม่นยำ ไม่ให้สับสนกับคอลัมน์วันที่
 function extractFuelName(row, keys) {
-  // ค้นหาคีย์ที่ตรงกับชื่อสินค้าหรือกลุ่มเชื้อเพลิงโดยเฉพาะ
   let fuelKeys = keys.filter(k => {
     let lk = k.trim().toLowerCase();
     return (lk.includes('สินค้า') || lk.includes('fuel') || lk.includes('type') || lk.includes('กลุ่มชพ') || lk.includes('ชื่อสินค้า')) && !lk.includes('วันที่');
@@ -260,7 +258,6 @@ function extractFuelName(row, keys) {
     let val = row[fk];
     if (val !== undefined && val !== null && String(val).trim() !== '') {
       let str = String(val).trim();
-      // แปลงรหัสตัวเลขเป็นชื่อสินค้ามาตรฐาน (หากใน json เป็นตัวเลข)
       if (!isNaN(str)) {
         if (str === '1') return 'กะลาปาล์ม';
         if (str === '2') return 'ไม้วิ่ง';
@@ -400,7 +397,7 @@ function renderDashboard(data, vendorHistory) {
     groups[item.fuel].push(item);
   });
 
-  let totalTonAll = 0, sumMoistureAll = 0, sumBahtAll = 0, countAll = 0;
+  let sumMoistureAll = 0, sumBahtAll = 0, countAll = 0;
 
   Object.keys(groups).forEach(fuelName => {
     let items = groups[fuelName];
@@ -410,16 +407,16 @@ function renderDashboard(data, vendorHistory) {
     let groupDust = items.reduce((sum, i) => sum + i.dust, 0) / items.length;
     let groupBaht = items.reduce((sum, i) => sum + i.bahtMj, 0) / items.length;
 
-    totalTonAll += groupTon;
     sumMoistureAll += groupMoisture;
     sumBahtAll += groupBaht;
     countAll++;
 
-    items.forEach((item, idx) => {
+    // แสดงชื่อสินค้าทุกบรรทัดของรายการผู้ขาย
+    items.forEach((item) => {
       let badgeClass = item.bahtMj > 0.150 ? 'badge-red' : 'badge-green';
       let row = document.createElement('tr');
       row.innerHTML = `
-        <td>${idx === 0 ? '<b>' + fuelName + '</b>' : ''}</td>
+        <td><b>${item.fuel}</b></td>
         <td>${item.name}</td>
         <td class="num">${item.ton.toLocaleString()}</td>
         <td class="num">${item.moisture.toFixed(2)}</td>
