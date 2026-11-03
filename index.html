@@ -248,18 +248,29 @@ async function loadData() {
   }
 }
 
-// ฟังก์ชันช่วยทำความสะอาดและดึงชื่อเชื้อเพลิงให้เป็นตัวหนังสือเสมอ
-function cleanFuelName(val) {
-  if (!val) return 'ไม่ระบุสินค้า';
-  let str = String(val).trim();
-  // ถ้าเป็นตัวเลขล้วน ให้แปลงเป็นชื่อกลาง หรือถ้ามีชื่อข้อความให้ใช้ชื่อนั้น
-  if (!isNaN(str)) {
-    if (str === '1') return 'กะลาปาล์ม';
-    if (str === '2') return 'ไม้วิ่ง';
-    if (str === '3') return 'ไม้สับ';
-    return 'เชื้อเพลิงชนิดที่ ' + str;
+// ฟังก์ชันดึงค่าชื่อสินค้า/กลุ่มเชื้อเพลิงให้แม่นยำ ไม่ให้สับสนกับคอลัมน์วันที่
+function extractFuelName(row, keys) {
+  // ค้นหาคีย์ที่ตรงกับชื่อสินค้าหรือกลุ่มเชื้อเพลิงโดยเฉพาะ
+  let fuelKeys = keys.filter(k => {
+    let lk = k.trim().toLowerCase();
+    return (lk.includes('สินค้า') || lk.includes('fuel') || lk.includes('type') || lk.includes('กลุ่มชพ') || lk.includes('ชื่อสินค้า')) && !lk.includes('วันที่');
+  });
+
+  for (let fk of fuelKeys) {
+    let val = row[fk];
+    if (val !== undefined && val !== null && String(val).trim() !== '') {
+      let str = String(val).trim();
+      // แปลงรหัสตัวเลขเป็นชื่อสินค้ามาตรฐาน (หากใน json เป็นตัวเลข)
+      if (!isNaN(str)) {
+        if (str === '1') return 'กะลาปาล์ม';
+        if (str === '2') return 'ไม้วิ่ง';
+        if (str === '3') return 'ไม้สับ';
+        return 'สินค้า (' + str + ')';
+      }
+      return str;
+    }
   }
-  return str;
+  return 'ไม่ระบุสินค้า';
 }
 
 function populateDropdowns() {
@@ -275,8 +286,7 @@ function populateDropdowns() {
     };
 
     let p = String(getVal(['โรงไฟฟ้า', 'Plant'])).trim();
-    let rawFuel = getVal(['สินค้า', 'Fuel', 'Type', 'ชื่อสินค้า', 'กลุ่มชพ']);
-    let f = cleanFuelName(rawFuel);
+    let f = extractFuelName(row, keys);
     let l = String(getVal(['Logistic', 'ขนส่ง', 'รถ'])).trim();
     
     if(p) plants.add(p);
@@ -317,8 +327,7 @@ function applyFilters() {
     };
 
     let plant = String(getVal(['โรงไฟฟ้า', 'Plant']) || '').trim();
-    let rawFuel = getVal(['สินค้า', 'Fuel', 'Type', 'ชื่อสินค้า', 'กลุ่มชพ']);
-    let fuel = cleanFuelName(rawFuel);
+    let fuel = extractFuelName(row, keys);
     let name = String(getVal(['ชื่อลูกค้า', 'Vendor', 'Customer', 'Name']) || '').trim();
     let logistic = String(getVal(['Logistic', 'ขนส่ง'])).trim();
     let dateStr = String(getVal(['วันที่ชั่งออก', 'วันที่ชั่ง', 'Date', 'วันที่'])).trim();
