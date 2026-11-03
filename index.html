@@ -120,7 +120,7 @@
   .ai-analysis-content { font-size: 13px; color: #354F44; line-height: 1.5; max-height: 200px; overflow-y: auto; }
   .alert-item { background: rgba(255,255,255,0.7); padding: 6px 8px; border-radius: 6px; margin-bottom: 4px; border-left: 3px solid var(--accent); }
 
-  /* Right Table Card (Compact & Scrollable with Sticky Elements) */
+  /* Right Table Card */
   .table-card {
     background: var(--card);
     border-radius: var(--radius);
@@ -133,6 +133,7 @@
   .table-container {
     max-height: 550px;
     overflow-y: auto;
+    overflow-x: auto;
     position: relative;
     border: 1px solid var(--border);
     border-radius: 10px;
@@ -140,35 +141,52 @@
 
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   
-  /* ตรึงหัวตารางให้อยู่ด้านบนสุดเวลาเลื่อนลง */
+  /* ตรึงหัวตารางด้านบนสุด */
   th { 
     position: sticky; 
     top: 0; 
-    background: #FAFCFB; 
-    z-index: 10; 
+    background: #E8F1EE; 
+    z-index: 20; 
     text-align: left; 
-    padding: 10px 10px; 
-    color: var(--muted); 
-    font-weight: 600; 
+    padding: 11px 10px; 
+    color: var(--primary-dark); 
+    font-weight: 700; 
     border-bottom: 2px solid var(--border); 
     white-space: nowrap; 
-    box-shadow: inset 0 -2px 0 var(--border);
   }
 
   th.num, td.num { text-align: right; }
   td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; background: #FFFFFF; }
   
-  /* ตรึงคอลัมน์แรก (กลุ่มเชื้อเพลิง) ให้ค้างไว้เวลาเลื่อนซ้าย-ขวาหรือเลื่อนลง */
+  /* ตรึงคอลัมน์ชื่อกลุ่มเชื้อเพลิง (Sticky Column) ให้อยู่ริมซ้ายเสมอเวลาเลื่อน */
   td.sticky-fuel {
     position: sticky;
     left: 0;
-    background: #FAFCFB;
-    z-index: 5;
+    background: #F4F8F6;
+    z-index: 10;
     font-weight: 700;
-    border-right: 1px solid var(--border);
+    border-right: 2px solid var(--border);
+    color: var(--primary);
   }
 
-  tr.sub-total td { background: #F0F4F2; font-weight: 700; color: var(--text); border-bottom: 2px solid var(--border); }
+  /* ตรึงหัวตารางของคอลัมน์แรกให้ทับซ้อนถูกต้อง */
+  th.sticky-fuel-header {
+    position: sticky;
+    left: 0;
+    top: 0;
+    z-index: 30;
+    background: #D8EAE5;
+  }
+
+  tr.sub-total td { background: #EAEEEC; font-weight: 700; color: var(--text); border-bottom: 2px solid var(--border); }
+  td.sticky-sub {
+    position: sticky;
+    left: 0;
+    background: #DCE6E2;
+    z-index: 10;
+    font-weight: 700;
+    border-right: 2px solid var(--border);
+  }
   
   .badge-green { background: #E2F0D9; color: #385723; padding: 3px 8px; border-radius: 6px; font-weight: 700; display: inline-block; text-align: right; }
   .badge-red { background: #FCE4D6; color: #C65911; padding: 3px 8px; border-radius: 6px; font-weight: 700; display: inline-block; text-align: right; }
@@ -237,14 +255,14 @@
       </div>
     </div>
 
-    <!-- Right Table with Sticky Header & Column -->
+    <!-- Right Table -->
     <div class="table-card">
       <h3>📋 รายงานคุณภาพเชื้อเพลิงและต้นทุน</h3>
       <div class="table-container">
         <table>
           <thead>
             <tr>
-              <th style="width: 140px; z-index: 20;">กลุ่มชพ.</th>
+              <th style="width: 140px;" class="sticky-fuel-header">กลุ่มชพ.</th>
               <th>ชื่อลูกค้า</th>
               <th class="num">Ton</th>
               <th class="num">%TM by weight</th>
@@ -444,18 +462,12 @@ function renderDashboard(data, vendorHistory) {
     sumBahtAll += groupBaht;
     countAll++;
 
-    // ใช้ rowspan เพื่อรวมกลุ่มชื่อสินค้าให้อยู่บรรทัดแรก และตรึงช่องไว้ตลอดเวลา
-    items.forEach((item, idx) => {
+    items.forEach((item) => {
       let badgeClass = item.bahtMj > 0.150 ? 'badge-red' : 'badge-green';
       let row = document.createElement('tr');
       
-      let fuelCellHtml = '';
-      if (idx === 0) {
-        fuelCellHtml = `<td rowspan="${items.length}" class="sticky-fuel" style="vertical-align: middle;">${fuelName}</td>`;
-      }
-
       row.innerHTML = `
-        ${fuelCellHtml}
+        <td class="sticky-fuel">${fuelName}</td>
         <td>${item.name}</td>
         <td class="num">${item.ton.toLocaleString()}</td>
         <td class="num">${item.moisture.toFixed(2)}</td>
@@ -469,7 +481,7 @@ function renderDashboard(data, vendorHistory) {
     let subRow = document.createElement('tr');
     subRow.className = 'sub-total';
     subRow.innerHTML = `
-      <td class="sticky-fuel" style="background:#EBF3EF;">รวม (${fuelName})</td>
+      <td class="sticky-sub">รวม (${fuelName})</td>
       <td>-</td>
       <td class="num">${groupTon.toLocaleString()}</td>
       <td class="num">${groupMoisture.toFixed(2)}</td>
