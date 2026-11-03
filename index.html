@@ -4,62 +4,61 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fuel Quality Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Mitr:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #F5F9F6;
+    --bg: #F7F9F8;
     --card: #FFFFFF;
-    --primary: #4A7C59;
-    --primary-light: #EBF3ED;
-    --text: #2C3E35;
-    --muted: #7E8F84;
-    --border: #D8E4DC;
-    --radius: 14px;
-    --shadow: 0 4px 20px rgba(74, 124, 89, 0.05);
+    --primary: #52796F;
+    --primary-light: #E8F1EE;
+    --accent: #E07A5F;
+    --text: #2F3E46;
+    --muted: #6B705C;
+    --border: #D8E2DC;
+    --radius: 16px;
+    --shadow: 0 6px 24px rgba(82, 121, 111, 0.06);
   }
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: 'Mitr', sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+  body { margin: 0; font-family: 'Nunito', 'Mitr', sans-serif; background: var(--bg); color: var(--text); padding: 24px; font-size: 15px; }
   .wrap { max-width: 1400px; margin: 0 auto; }
 
-  /* Header สไตล์พรีเมียม */
+  /* Header */
   .top-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: var(--card);
-    padding: 16px 24px;
+    padding: 18px 26px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    margin-bottom: 16px;
+    margin-bottom: 18px;
     border: 1px solid var(--border);
   }
-  .brand-title { display: flex; align-items: baseline; gap: 12px; }
-  .brand-title h1 { margin: 0; font-size: 22px; color: var(--text); font-weight: 600; }
+  .brand-title h1 { margin: 0; font-size: 22px; color: var(--text); font-weight: 700; }
   .brand-title h1 span { color: var(--primary); }
-  .brand-title p { margin: 0; font-size: 13px; color: var(--muted); border-left: 2px solid var(--border); padding-left: 12px; }
+  .brand-title p { margin: 4px 0 0 0; font-size: 14px; color: var(--muted); }
   
   .update-badge {
-    background: #F0F4F1;
+    background: var(--primary-light);
     border: 1px solid var(--border);
-    padding: 8px 14px;
-    border-radius: 10px;
-    font-size: 12px;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 13px;
     color: var(--muted);
     text-align: right;
   }
-  .update-badge b { color: var(--text); display: block; font-size: 13px; }
+  .update-badge b { color: var(--primary); display: block; font-size: 14px; }
 
-  /* Filter Bar แถบบนสุด */
+  /* Filter Bar */
   .filter-bar {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 12px;
+    gap: 14px;
     background: var(--card);
-    padding: 14px 18px;
+    padding: 16px 20px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    margin-bottom: 16px;
+    margin-bottom: 18px;
     border: 1px solid var(--border);
   }
   .filter-item {
@@ -68,69 +67,78 @@
     gap: 8px;
     background: #FAFCFB;
     border: 1px solid var(--border);
-    padding: 8px 12px;
-    border-radius: 10px;
-    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 14px;
     color: var(--muted);
-    cursor: pointer;
   }
   .filter-item select, .filter-item input {
     border: none;
     background: transparent;
-    font-family: 'Mitr', sans-serif;
-    font-size: 13px;
+    font-family: 'Nunito', 'Mitr', sans-serif;
+    font-size: 14px;
     color: var(--text);
     width: 100%;
     outline: none;
   }
 
-  /* Main Layout: ซ้าย Card สรุป / ขวา ตารางหลัก */
+  /* Main Layout */
   .main-grid {
     display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 16px;
+    grid-template-columns: 300px 1fr;
+    gap: 18px;
   }
   @media(max-width: 1000px) { .main-grid { grid-template-columns: 1fr; } }
 
-  /* Left Cards สรุปค่าเฉลี่ย */
-  .left-cards { display: flex; flex-direction: column; gap: 12px; }
+  /* Left Cards */
+  .left-cards { display: flex; flex-direction: column; gap: 14px; }
   .stat-card {
     background: var(--card);
     border-radius: var(--radius);
-    padding: 16px 20px;
+    padding: 18px 22px;
     box-shadow: var(--shadow);
     border: 1px solid var(--border);
     position: relative;
     overflow: hidden;
   }
   .stat-card::after {
-    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--primary);
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary);
   }
-  .stat-card h4 { margin: 0 0 6px 0; font-size: 13px; color: var(--muted); font-weight: 500; display: flex; align-items: center; gap: 6px; }
-  .stat-value { font-size: 26px; font-weight: 600; color: var(--text); }
-  .stat-value span { font-size: 15px; font-weight: 500; color: var(--muted); }
+  .stat-card h4 { margin: 0 0 6px 0; font-size: 14px; color: var(--muted); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+  .stat-value { font-size: 28px; font-weight: 700; color: var(--text); }
+  .stat-value span { font-size: 16px; font-weight: 600; color: var(--muted); }
+
+  /* AI Smart Analysis Card */
+  .ai-analysis-card {
+    background: linear-gradient(135deg, #E8F1EE, #D8EAE5);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    box-shadow: var(--shadow);
+    border: 1px solid #BFE0D4;
+  }
+  .ai-analysis-card h4 { margin: 0 0 8px 0; font-size: 15px; color: #2F5243; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .ai-analysis-content { font-size: 13.5px; color: #354F44; line-height: 1.6; max-height: 220px; overflow-y: auto; }
+  .alert-item { background: rgba(255,255,255,0.7); padding: 8px 10px; border-radius: 8px; margin-bottom: 6px; border-left: 4px solid var(--accent); }
 
   /* Right Table Card */
   .table-card {
     background: var(--card);
     border-radius: var(--radius);
-    padding: 20px;
+    padding: 22px;
     box-shadow: var(--shadow);
     border: 1px solid var(--border);
   }
-  .table-card h3 { margin: 0 0 14px 0; font-size: 16px; color: var(--text); font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .table-card h3 { margin: 0 0 16px 0; font-size: 17px; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 8px; }
   
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th { text-align: left; padding: 12px 10px; color: var(--muted); font-weight: 500; border-bottom: 2px solid var(--border); background: #FAFCFB; white-space: nowrap; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; padding: 14px 12px; color: var(--muted); font-weight: 600; border-bottom: 2px solid var(--border); background: #FAFCFB; white-space: nowrap; }
   th.num, td.num { text-align: right; }
-  td { padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  td { padding: 14px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
   
-  tr.group-header td { background: #F8FBF9; font-weight: 600; color: var(--primary); border-top: 1px solid var(--border); }
-  tr.sub-total td { background: #FAFCFB; font-weight: 600; color: var(--text); border-bottom: 2px solid var(--border); }
+  tr.sub-total td { background: #FAFCFB; font-weight: 700; color: var(--text); border-bottom: 2px solid var(--border); }
   
-  /* Baht/MJ Highlight status */
-  .badge-green { background: #E2F0D9; color: #385723; padding: 4px 10px; border-radius: 6px; font-weight: 600; display: inline-block; text-align: right; }
-  .badge-red { background: #FCE4D6; color: #C65911; padding: 4px 10px; border-radius: 6px; font-weight: 600; display: inline-block; text-align: right; }
+  .badge-green { background: #E2F0D9; color: #385723; padding: 5px 12px; border-radius: 8px; font-weight: 700; display: inline-block; text-align: right; }
+  .badge-red { background: #FCE4D6; color: #C65911; padding: 5px 12px; border-radius: 8px; font-weight: 700; display: inline-block; text-align: right; }
 </style>
 </head>
 <body>
@@ -140,10 +148,10 @@
   <div class="top-header">
     <div class="brand-title">
       <h1>Fuel Quality <span>Dashboard</span></h1>
-      <p>อัปเดตคุณภาพเชื้อเพลิงโรงไฟฟ้า (รายวัน) <span id="dateRangeInfo"></span></p>
+      <p>ระบบติดตามและวิเคราะห์คุณภาพเชื้อเพลิงโรงไฟฟ้า (รายวัน)</p>
     </div>
     <div class="update-badge">
-      อัปเดตล่าสุด
+      อัปเดตข้อมูลล่าสุด
       <b id="lastUpdateTime">-</b>
     </div>
   </div>
@@ -163,7 +171,7 @@
       <select id="filterLogistic" onchange="applyFilters()"><option value="">Logistic ทั้งหมด</option></select>
     </div>
     <div class="filter-item">
-      <span>👥</span>
+      <span>🔍</span>
       <input type="text" id="filterCustomer" placeholder="ค้นหาชื่อลูกค้า..." oninput="applyFilters()">
     </div>
     <div class="filter-item">
@@ -176,7 +184,7 @@
   <!-- Main Content Grid -->
   <div class="main-grid">
     
-    <!-- Left Stats -->
+    <!-- Left Stats & AI Analysis -->
     <div class="left-cards">
       <div class="stat-card">
         <h4>💧 ความชื้นเฉลี่ย (%TM)</h4>
@@ -186,20 +194,19 @@
         <h4>🪙 Baht/MJ เฉลี่ย</h4>
         <div class="stat-value" id="avgBahtMj">0.000</div>
       </div>
-      <div class="stat-card">
-        <h4>🌋 ขี้เถ้าเฉลี่ย (%Ash)</h4>
-        <div class="stat-value" id="avgAsh">0.00 <span>%</span></div>
-      </div>
-      <!-- ตัวการ์ตูนตกแต่งน่ารักๆ มินิมอล -->
-      <div style="text-align:center; padding:15px; background:var(--card); border-radius:var(--radius); border:1px solid var(--border); box-shadow:var(--shadow);">
-        <span style="font-size:36px;">🌱🦊⚡</span>
-        <p style="margin:6px 0 0 0; font-size:12px; color:var(--muted);">Biomass Smart Analytics</p>
+      
+      <!-- AI วิเคราะห์แนวโน้มความชื้นสูงขึ้น -->
+      <div class="ai-analysis-card">
+        <h4>🤖 AI Smart Monitoring</h4>
+        <div class="ai-analysis-content" id="aiMoistureAlerts">
+          กำลังวิเคราะห์แนวโน้มความชื้นผู้ขาย...
+        </div>
       </div>
     </div>
 
     <!-- Right Table -->
     <div class="table-card">
-      <h3>📋 คุณภาพเชื้อเพลิง</h3>
+      <h3>📋 รายงานคุณภาพเชื้อเพลิงและต้นทุน</h3>
       <div style="overflow-x:auto;">
         <table>
           <thead>
@@ -231,7 +238,6 @@ async function loadData() {
     let response = await fetch('./data.json?v=' + new Date().getTime());
     globalRawData = await response.json();
     
-    // แสดงเวลาปัจจุบันที่โหลด
     let now = new Date();
     document.getElementById('lastUpdateTime').textContent = now.toLocaleDateString('th-TH', {year:'numeric', month:'short', day:'numeric'}) + ' ' + now.toLocaleTimeString();
 
@@ -255,11 +261,13 @@ function populateDropdowns() {
     };
 
     let p = String(getVal(['โรงไฟฟ้า', 'Plant'])).trim();
-    let f = String(getVal(['สินค้า', 'Fuel', 'Type'])).trim();
+    // ดึงค่าสินค้าที่เป็นชื่อสินค้า (ตัวหนังสือ) ไม่เอาตัวเลขรหัส
+    let f = String(getVal(['สินค้า', 'Fuel', 'Type', 'ชื่อสินค้า'])).trim();
     let l = String(getVal(['Logistic', 'ขนส่ง', 'รถ'])).trim();
     
     if(p) plants.add(p);
-    if(f) fuels.add(f);
+    // ตรวจสอบว่าไม่ใช่ตัวเลขล้วน ถึงจะนำมาแสดงเป็นชื่อสินค้า
+    if(f && isNaN(f)) fuels.add(f);
     if(l) logistics.add(l);
   });
 
@@ -286,6 +294,7 @@ function applyFilters() {
   let endDate = document.getElementById('endDate').value;
 
   let filtered = [];
+  let vendorHistory = {}; // สำหรับเก็บข้อมูลมาวิเคราะห์แนวโน้มความชื้น
 
   globalRawData.forEach(row => {
     let keys = Object.keys(row);
@@ -295,7 +304,7 @@ function applyFilters() {
     };
 
     let plant = String(getVal(['โรงไฟฟ้า', 'Plant']) || '').trim();
-    let fuel = String(getVal(['สินค้า', 'Fuel', 'Type']) || 'ไม่ระบุสินค้า').trim();
+    let fuel = String(getVal(['สินค้า', 'Fuel', 'Type', 'ชื่อสินค้า'])).trim();
     let name = String(getVal(['ชื่อลูกค้า', 'Vendor', 'Customer', 'Name']) || '').trim();
     let logistic = String(getVal(['Logistic', 'ขนส่ง'])).trim();
     let dateStr = String(getVal(['วันที่ชั่งออก', 'วันที่ชั่ง', 'Date', 'วันที่'])).trim();
@@ -316,16 +325,24 @@ function applyFilters() {
 
     if (!name) return;
 
-    filtered.push({
-      fuel, name, ton, moisture, ash, dust,
+    let item = {
+      fuel: fuel || 'ไม่ระบุสินค้า',
+      name, ton, moisture, ash, dust,
+      date: dateStr || '9999-99-99',
       bahtMj: netCv > 0 ? parseFloat((price / netCv).toFixed(3)) : 0
-    });
+    };
+
+    filtered.push(item);
+
+    // เก็บข้อมูลรายชื่อผู้ขายแยกตามวันที่เพื่อเช็คแนวโน้มความชื้น
+    if (!vendorHistory[name]) vendorHistory[name] = [];
+    vendorHistory[name].push({ date: item.date, moisture });
   });
 
-  renderDashboard(filtered);
+  renderDashboard(filtered, vendorHistory);
 }
 
-function renderDashboard(data) {
+function renderDashboard(data, vendorHistory) {
   let tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
 
@@ -333,18 +350,40 @@ function renderDashboard(data) {
     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted);">🌱 ไม่พบข้อมูลตามเงื่อนไขที่เลือก</td></tr>`;
     document.getElementById('avgMoisture').innerHTML = `0.00 <span>%</span>`;
     document.getElementById('avgBahtMj').textContent = `0.000`;
-    document.getElementById('avgAsh').innerHTML = `0.00 <span>%</span>`;
+    document.getElementById('aiMoistureAlerts').innerHTML = `💡 ไม่พบข้อมูลเพียงพอสำหรับการวิเคราะห์`;
     return;
   }
 
-  // จัดกลุ่มตามสินค้า (Fuel Grouping)
+  // AI วิเคราะห์หาผู้ขายที่มีแนวโน้มความชื้นสูงขึ้น
+  let warningHtml = '';
+  Object.keys(vendorHistory).forEach(vendor => {
+    let records = vendorHistory[vendor];
+    if (records.length >= 2) {
+      // เรียงลำดับตามวันที่
+      records.sort((a, b) => a.date.localeCompare(b.date));
+      let firstM = records[0].moisture;
+      let lastM = records[records.length - 1].moisture;
+      
+      // ถ้าความชื้นรอบล่าสุดสูงกว่ารอบแรกมากกว่า 3% ถือว่ามีแนวโน้มสูงขึ้น
+      if (lastM - firstM >= 3.0) {
+        warningHtml += `<div class="alert-item">⚠️ <b>${vendor}</b><br>ความชื้นขยับสูงขึ้น (${firstM.toFixed(1)}% ➔ ${lastM.toFixed(1)}%) ควรเฝ้าระวัง</div>`;
+      }
+    }
+  });
+
+  if (!warningHtml) {
+    warningHtml = `<div style="color:var(--primary);font-weight:600;">✨ ปกติ: ยังไม่พบผู้ขายที่มีแนวโน้มความชื้นสูงขึ้นผิดปกติ</div>`;
+  }
+  document.getElementById('aiMoistureAlerts').innerHTML = warningHtml;
+
+  // จัดกลุ่มตามสินค้า
   let groups = {};
   data.forEach(item => {
     if (!groups[item.fuel]) groups[item.fuel] = [];
     groups[item.fuel].push(item);
   });
 
-  let totalTonAll = 0, sumMoistureAll = 0, sumBahtAll = 0, sumAshAll = 0, countAll = 0;
+  let totalTonAll = 0, sumMoistureAll = 0, sumBahtAll = 0, countAll = 0;
 
   Object.keys(groups).forEach(fuelName => {
     let items = groups[fuelName];
@@ -357,12 +396,10 @@ function renderDashboard(data) {
     totalTonAll += groupTon;
     sumMoistureAll += groupMoisture;
     sumBahtAll += groupBaht;
-    sumAshAll += groupAsh;
     countAll++;
 
-    // พิมพ์รายการลูกค้าย่อย
     items.forEach((item, idx) => {
-      let badgeClass = item.bahtMj > 0.150 ? 'badge-red' : 'badge-green'; // เกณฑ์สีเตือน
+      let badgeClass = item.bahtMj > 0.150 ? 'badge-red' : 'badge-green';
       let row = document.createElement('tr');
       row.innerHTML = `
         <td>${idx === 0 ? '<b>' + fuelName + '</b>' : ''}</td>
@@ -376,11 +413,10 @@ function renderDashboard(data) {
       tbody.appendChild(row);
     });
 
-    // แถวสรุป (รวม) ประจำกลุ่มสินค้า
     let subRow = document.createElement('tr');
     subRow.className = 'sub-total';
     subRow.innerHTML = `
-      <td>รวม</td>
+      <td>รวม (${fuelName})</td>
       <td>-</td>
       <td class="num">${groupTon.toLocaleString()}</td>
       <td class="num">${groupMoisture.toFixed(2)}</td>
@@ -391,11 +427,9 @@ function renderDashboard(data) {
     tbody.appendChild(subRow);
   });
 
-  // อัปเดต Card ด้านซ้าย
   if (countAll > 0) {
     document.getElementById('avgMoisture').innerHTML = `${(sumMoistureAll / countAll).toFixed(2)} <span>%</span>`;
     document.getElementById('avgBahtMj').textContent = (sumBahtAll / countAll).toFixed(3);
-    document.getElementById('avgAsh').innerHTML = `${(sumAshAll / countAll).toFixed(2)} <span>%</span>`;
   }
 }
 
