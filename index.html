@@ -19,21 +19,26 @@
   .ai-advisor-strip{background:linear-gradient(135deg, #1B3B2B, #2C5E43);color:white;border-radius:var(--radius);padding:18px 22px;margin-bottom:16px;box-shadow:var(--shadow);border-left:6px solid #48BB78;}
   .ai-header{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:#9AE6B4;margin-bottom:8px;}
   .ai-body{font-size:14px;line-height:1.5;color:#E2E8F0;}
-  .filter-bar{display:flex;flex-wrap:wrap;gap:12px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 18px;margin-bottom:16px;align-items:center;}
-  .filter-bar label{font-size:13px;color:var(--muted);margin-right:4px;}
-  .filter-bar input, .filter-bar select{padding:7px 10px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:'Mitr',sans-serif;font-size:13px;}
-  .btn{border:none;padding:8px 16px;border-radius:10px;font-family:'Mitr',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:.2s;}
+  .filter-bar{display:flex;flex-wrap:wrap;gap:12px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 20px;margin-bottom:16px;align-items:center;}
+  .filter-group{display:flex;flex-direction:column;gap:4px;}
+  .filter-bar label{font-size:12px;color:var(--muted);font-weight:500;}
+  .filter-bar input, .filter-bar select{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:'Mitr',sans-serif;font-size:13px;outline:none;}
+  .filter-bar input:focus, .filter-bar select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(106,170,120,0.15);}
+  .filter-actions{display:flex;gap:8px;align-self:flex-end;}
+  .btn{border:none;padding:8px 16px;border-radius:10px;font-family:'Mitr',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:.2s;height:38px;}
   .btn-primary{background:var(--primary-dark);color:white;}
+  .btn-primary:hover{background:#3b7144;}
   .btn-ghost{background:var(--bg);color:var(--muted);border:1px solid var(--border);}
-  .grid-analytics{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;margin-bottom:16px;}
+  .btn-ghost:hover{background:#e2ebe1;}
+  .grid-analytics{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;margin-bottom:16px;}
   @media(max-width:900px){.grid-analytics{grid-template-columns:1fr;}}
-  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;}
-  .card h3{margin:0 0 12px;font-size:14px;color:var(--primary-dark);display:flex;align-items:center;gap:6px;}
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;}
+  .card h3{margin:0 0 14px;font-size:15px;color:var(--primary-dark);display:flex;align-items:center;gap:6px;}
   table{width:100%;border-collapse:collapse;font-size:13px;}
-  th{text-align:left;padding:10px;color:var(--muted);font-weight:500;border-bottom:2px solid var(--border);white-space:nowrap;}
+  th{text-align:left;padding:12px 10px;color:var(--muted);font-weight:500;border-bottom:2px solid var(--border);white-space:nowrap;}
   th.num, td.num{text-align:right;}
-  td{padding:10px;border-bottom:1px solid var(--border);vertical-align:middle;}
-  tr.vendor-row:hover{background:rgba(106,170,120,0.08);}
+  td{padding:12px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+  tr.vendor-row:hover{background:rgba(106,170,120,0.06);}
   .tier-badge{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
   .tier-a{background:#E7F6EA;color:#2F9E52;border:1px solid #2F9E52;}
   .tier-b{background:#EBF3FD;color:#2B6CB0;border:1px solid #2B6CB0;}
@@ -51,13 +56,30 @@
 
   <!-- แถบตัวกรอง (Filter Bar) -->
   <div class="filter-bar">
-    <div><label>⚡ โรงไฟฟ้า:</label><select id="filterPlant" onchange="applyFilters()"><option value="">-- ทุกโรงไฟฟ้า --</option></select></div>
-    <div><label>🪵 สินค้า:</label><select id="filterFuel" onchange="applyFilters()"><option value="">-- ทุกสินค้า --</option></select></div>
-    <div><label>📅 ตั้งแต่:</label><input type="date" id="startDate"></div>
-    <div><label>ถึง:</label><input type="date" id="endDate"></div>
-    <div><label>🔍 ลูกค้า:</label><input type="text" id="filterCustomer" placeholder="พิมพ์ชื่อลูกค้า..." oninput="applyFilters()" style="width:130px;"></div>
-    <button class="btn btn-primary" onclick="applyFilters()">🔍 กรองข้อมูล</button>
-    <button class="btn btn-ghost" onclick="resetFilter()">↺ รีเซ็ต</button>
+    <div class="filter-group">
+      <label>⚡ โรงไฟฟ้า</label>
+      <select id="filterPlant" onchange="applyFilters()"><option value="">-- ทุกโรงไฟฟ้า --</option></select>
+    </div>
+    <div class="filter-group">
+      <label>🪵 สินค้า</label>
+      <select id="filterFuel" onchange="applyFilters()"><option value="">-- ทุกสินค้า --</option></select>
+    </div>
+    <div class="filter-group">
+      <label>📅 ตั้งแต่</label>
+      <input type="date" id="startDate" onchange="applyFilters()">
+    </div>
+    <div class="filter-group">
+      <label>ถึง</label>
+      <input type="date" id="endDate" onchange="applyFilters()">
+    </div>
+    <div class="filter-group">
+      <label>🔍 ชื่อลูกค้า</label>
+      <input type="text" id="filterCustomer" placeholder="พิมพ์ค้นหา..." oninput="applyFilters()">
+    </div>
+    <div class="filter-actions">
+      <button class="btn btn-primary" onclick="applyFilters()">กรอง</button>
+      <button class="btn btn-ghost" onclick="resetFilter()">รีเซ็ต</button>
+    </div>
   </div>
 
   <div class="grid-analytics">
@@ -163,7 +185,6 @@ function applyFilters() {
     let name = String(getVal(['ชื่อลูกค้า', 'Vendor', 'Customer', 'Name']) || 'ไม่ระบุชื่อ').trim();
     let dateStr = String(getVal(['วันที่', 'Date'])).trim();
 
-    // เงื่อนไขกรอง
     if (selPlant && plant !== selPlant) return;
     if (selFuel && fuel !== selFuel) return;
     if (searchCust && !name.toLowerCase().includes(searchCust)) return;
@@ -264,7 +285,7 @@ function renderChart(vendors) {
   const ctx = document.getElementById('barChart').getContext('2d');
   if(chartInstance) chartInstance.destroy();
 
-  let topVendors = vendors.slice(0, 10); // แสดงสูงสุด 10 อันดับแรกในกราฟ
+  let topVendors = vendors.slice(0, 10);
 
   chartInstance = new Chart(ctx, {
     type: 'bar',
