@@ -45,10 +45,7 @@
   tr.vendor-row{cursor:pointer;transition:.15s;}
   tr.vendor-row:hover{background:rgba(106,170,120,0.08);}
   .tier-badge{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
-  .tier-a{background:#E7F6EA;color:#2F9E52;border:1px solid #2F9E52;}
   .tier-b{background:#EBF3FD;color:#2B6CB0;border:1px solid #2B6CB0;}
-  .tier-c{background:#FFF6DC;color:#C9972A;border:1px solid #C9972A;}
-  .tier-d{background:#FDEAEA;color:#D9534F;border:1px solid #D9534F;}
   .chart-container{position:relative;height:260px;width:100%;}
   .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:100;justify-content:center;align-items:center;padding:16px;}
   .modal-card{background:var(--card);width:100%;max-width:700px;border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,0.15);padding:24px;position:relative;}
@@ -112,20 +109,27 @@ let scatterChartInstance = null;
 
 async function loadData() {
   try {
-    let response = await fetch('data.json?v=' + new Date().getTime()); // ป้องกันติด Cache
+    let response = await fetch('./data.json?v=' + new Date().getTime());
     let rawData = await response.json();
     
     database = {};
     
     rawData.forEach(row => {
-      let plant = (row['โรงไฟฟ้า'] || row['Plant'] || 'โรงไฟฟ้าหลัก').trim();
-      let fuel = (row['สินค้า'] || row['FuelType'] || 'รวมเชื้อเพลิง').trim();
-      let name = (row['ชื่อลูกค้า'] || row['VendorName'] || 'ไม่ระบุชื่อ').trim();
+      // ค้นหาคีย์ใน JSON แบบยืดหยุ่น ป้องกันปัญหาเว้นวรรคหรือพิมพ์ต่างกัน
+      let keys = Object.keys(row);
+      let getVal = (keywords) => {
+        let foundKey = keys.find(k => keywords.some(kw => k.trim().toLowerCase().includes(kw)));
+        return foundKey ? row[foundKey] : '';
+      };
+
+      let plant = String(getVal(['โรงไฟฟ้า', 'plant']) || 'โรงไฟฟ้าหลัก').trim();
+      let fuel = String(getVal(['สินค้า', 'fuel', 'type']) || 'รวมเชื้อเพลิง').trim();
+      let name = String(getVal(['ชื่อลูกค้า', 'vendor', 'name']) || 'ไม่ระบุชื่อ').trim();
       
-      let netCv = parseFloat(row['Net CV ARB (kcal/kg)'] || row['NetCV'] || 0);
-      let price = parseFloat(row['Price'] || row['ราคา/ตัน'] || 0);
-      let moisture = parseFloat(row['%TM'] || row['ความชื้นจริง(ชิพ)'] || row['Moisture'] || 0);
-      let ton = parseFloat(row['นน.สุทธิ'] || row['Ton'] || 0);
+      let netCv = parseFloat(getVal(['net cv', 'kcal'])) || 0;
+      let price = parseFloat(getVal(['price', 'ราคา'])) || 0;
+      let moisture = parseFloat(getVal(['%tm', 'ความชื้น', 'moisture'])) || 0;
+      let ton = parseFloat(getVal(['นน.สุทธิ', 'ton', 'weight'])) || 0;
       let bahtMj = netCv > 0 ? parseFloat((price / netCv).toFixed(4)) : 0;
 
       if (!database[plant]) database[plant] = {};
@@ -161,11 +165,11 @@ async function loadData() {
       });
       switchPlant(currentPlant);
     } else {
-      document.getElementById('aiRecommendationText').innerHTML = "⚠️ ไม่พบข้อมูลในไฟล์ data.json ตรวจสอบชื่อคอลัมน์อีกครั้ง";
+      document.getElementById('aiRecommendationText').innerHTML = "⚠️ ไม่พบข้อมูลในไฟล์ data.json";
     }
   } catch (error) {
     console.error("Error:", error);
-    document.getElementById('aiRecommendationText').innerHTML = "⚠️ โหลดไฟล์ data.json ไม่สำเร็จ";
+    document.getElementById('aiRecommendationText').innerHTML = "⚠️ โหลดไฟล์ data.json ไม่สำเร็จ (เช็คว่าวางไฟล์ไว้คู่กันไหม)";
   }
 }
 
@@ -228,7 +232,7 @@ function renderAll() {
     `;
     tbody.appendChild(row);
   });
-  document.getElementById('alertBox'].innerHTML = `<div style="background:var(--green-bg);color:var(--green-text);padding:12px;border-radius:8px;text-align:center;">✨ ระบบดึงข้อมูลสำเร็จ</div>`;
+  document.getElementById('alertBox'].innerHTML = `<div style="background:var(--green-bg);color:var(--green-text);padding:12px;border-radius:8px;text-align:center;">✨ โหลดและประมวลผลข้อมูลสำเร็จ</div>`;
 }
 
 function resetFilter() { renderAll(); }
