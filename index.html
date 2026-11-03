@@ -120,7 +120,7 @@
   .ai-analysis-content { font-size: 13px; color: #354F44; line-height: 1.5; max-height: 200px; overflow-y: auto; }
   .alert-item { background: rgba(255,255,255,0.7); padding: 6px 8px; border-radius: 6px; margin-bottom: 4px; border-left: 3px solid var(--accent); }
 
-  /* Right Table Card (Compact) */
+  /* Right Table Card (Compact & Scrollable with Sticky Elements) */
   .table-card {
     background: var(--card);
     border-radius: var(--radius);
@@ -130,12 +130,45 @@
   }
   .table-card h3 { margin: 0 0 14px 0; font-size: 15px; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 6px; }
   
+  .table-container {
+    max-height: 550px;
+    overflow-y: auto;
+    position: relative;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th { text-align: left; padding: 10px 10px; color: var(--muted); font-weight: 600; border-bottom: 2px solid var(--border); background: #FAFCFB; white-space: nowrap; }
-  th.num, td.num { text-align: right; }
-  td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
   
-  tr.sub-total td { background: #FAFCFB; font-weight: 700; color: var(--text); border-bottom: 2px solid var(--border); }
+  /* ตรึงหัวตารางให้อยู่ด้านบนสุดเวลาเลื่อนลง */
+  th { 
+    position: sticky; 
+    top: 0; 
+    background: #FAFCFB; 
+    z-index: 10; 
+    text-align: left; 
+    padding: 10px 10px; 
+    color: var(--muted); 
+    font-weight: 600; 
+    border-bottom: 2px solid var(--border); 
+    white-space: nowrap; 
+    box-shadow: inset 0 -2px 0 var(--border);
+  }
+
+  th.num, td.num { text-align: right; }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; background: #FFFFFF; }
+  
+  /* ตรึงคอลัมน์แรก (กลุ่มเชื้อเพลิง) ให้ค้างไว้เวลาเลื่อนซ้าย-ขวาหรือเลื่อนลง */
+  td.sticky-fuel {
+    position: sticky;
+    left: 0;
+    background: #FAFCFB;
+    z-index: 5;
+    font-weight: 700;
+    border-right: 1px solid var(--border);
+  }
+
+  tr.sub-total td { background: #F0F4F2; font-weight: 700; color: var(--text); border-bottom: 2px solid var(--border); }
   
   .badge-green { background: #E2F0D9; color: #385723; padding: 3px 8px; border-radius: 6px; font-weight: 700; display: inline-block; text-align: right; }
   .badge-red { background: #FCE4D6; color: #C65911; padding: 3px 8px; border-radius: 6px; font-weight: 700; display: inline-block; text-align: right; }
@@ -204,14 +237,14 @@
       </div>
     </div>
 
-    <!-- Right Table -->
+    <!-- Right Table with Sticky Header & Column -->
     <div class="table-card">
       <h3>📋 รายงานคุณภาพเชื้อเพลิงและต้นทุน</h3>
-      <div style="overflow-x:auto;">
+      <div class="table-container">
         <table>
           <thead>
             <tr>
-              <th style="width: 140px;">กลุ่มชพ.</th>
+              <th style="width: 140px; z-index: 20;">กลุ่มชพ.</th>
               <th>ชื่อลูกค้า</th>
               <th class="num">Ton</th>
               <th class="num">%TM by weight</th>
@@ -411,14 +444,14 @@ function renderDashboard(data, vendorHistory) {
     sumBahtAll += groupBaht;
     countAll++;
 
-    // แสดงชื่อสินค้าไว้ที่บรรทัดแรกของกลุ่ม (ใช้ rowspan) และเว้นว่างในบรรทัดถัดไป
+    // ใช้ rowspan เพื่อรวมกลุ่มชื่อสินค้าให้อยู่บรรทัดแรก และตรึงช่องไว้ตลอดเวลา
     items.forEach((item, idx) => {
       let badgeClass = item.bahtMj > 0.150 ? 'badge-red' : 'badge-green';
       let row = document.createElement('tr');
       
       let fuelCellHtml = '';
       if (idx === 0) {
-        fuelCellHtml = `<td rowspan="${items.length + 1}" style="vertical-align: top; font-weight: 700; background: #FAFCFB; border-right: 1px solid var(--border);">${fuelName}</td>`;
+        fuelCellHtml = `<td rowspan="${items.length}" class="sticky-fuel" style="vertical-align: middle;">${fuelName}</td>`;
       }
 
       row.innerHTML = `
@@ -436,7 +469,8 @@ function renderDashboard(data, vendorHistory) {
     let subRow = document.createElement('tr');
     subRow.className = 'sub-total';
     subRow.innerHTML = `
-      <td>รวม (${fuelName})</td>
+      <td class="sticky-fuel" style="background:#EBF3EF;">รวม (${fuelName})</td>
+      <td>-</td>
       <td class="num">${groupTon.toLocaleString()}</td>
       <td class="num">${groupMoisture.toFixed(2)}</td>
       <td class="num">${groupAsh.toFixed(2)}</td>
