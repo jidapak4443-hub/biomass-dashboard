@@ -141,7 +141,6 @@
 
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   
-  /* ตรึงหัวตารางด้านบนสุด */
   th { 
     position: sticky; 
     top: 0; 
@@ -158,7 +157,6 @@
   th.num, td.num { text-align: right; }
   td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; background: #FFFFFF; }
   
-  /* ตรึงคอลัมน์ชื่อกลุ่มเชื้อเพลิง (Sticky Column) ให้อยู่ริมซ้ายเสมอเวลาเลื่อน */
   td.sticky-fuel {
     position: sticky;
     left: 0;
@@ -169,7 +167,6 @@
     color: var(--primary);
   }
 
-  /* ตรึงหัวตารางของคอลัมน์แรกให้ทับซ้อนถูกต้อง */
   th.sticky-fuel-header {
     position: sticky;
     left: 0;
@@ -364,7 +361,8 @@ function applyFilters() {
   let startDate = document.getElementById('startDate').value;
   let endDate = document.getElementById('endDate').value;
 
-  let filtered = [];
+  // ใช้ Aggregation รวมข้อมูลรายผู้ขาย (Vendor) และกลุ่มสินค้า (Fuel) ตามเงื่อนไข
+  let aggregatedMap = {};
   let vendorHistory = {};
 
   globalRawData.forEach(row => {
@@ -396,19 +394,58 @@ function applyFilters() {
 
     if (!name) return;
 
-    let item = {
-      fuel, name, ton, moisture, ash, dust,
-      date: dateStr || '9999-99-99',
-      bahtMj: netCv > 0 ? parseFloat((price / netCv).toFixed(3)) : 0
-    };
+    // คีย์สำหรับรวมข้อมูลผู้ขายในกลุ่มสินค้าเดียวกัน
+    let groupKey = fuel + "___" + name;
 
-    filtered.push(item);
+    if (!aggregatedMap[groupKey]) {
+      aggregatedMap[groupKey] = {
+        fuel,
+        name,
+        sumTon: 0,
+        sumTonPrice: 0,     // สำหรับคำนวณ Baht/MJ: SUM(Ton * Price)
+        sumTonNetCv: 0,     // สำหรับคำนวณ Baht/MJ: SUM(Ton * Net CV)
+        sumTonMoisture: 0,  // ถ่วงน้ำหนัก %TM
+        sumTonAsh: 0,       // ถ่วงน้ำหนัก Ash
+        sumTonDust: 0,      // ถ่วงน้ำหนัก ฝุ่นแกลบ
+      };
+    }
 
+    let item = aggregatedMap[groupKey];
+    item.sumTon += ton;
+    item.sumTonPrice += (ton * price);
+    item.sumTonNetCv += (ton * netCv);
+    item.sumTonMoisture += (moisture * ton);
+    item.sumTonAsh += (ash * ton);
+    item.sumTonDust += (dust * ton);
+
+    // เก็บประวัติไว้เช็คแนวโน้มความชื้นของ AI
     if (!vendorHistory[name]) vendorHistory[name] = [];
-    vendorHistory[name].push({ date: item.date, moisture });
+    vendorHistory[name].push({ date: dateStr || '9999-99-99', moisture });
   });
 
-  renderDashboard(filtered, vendorHistory);
+  // แปลงค่าจาก Map เป็น Array และคำนวณค่าเฉลี่ย
+  let processedData = Object.values(aggregatedMap).map(item => {
+    let ton = item.sumTon;
+    let avgMoisture = ton > 0 ? item.sumTonMoisture / ton : 0;
+    let avgAsh = ton > 0 ? item.sumTonAsh / ton : 0;
+    let avgDust = ton > 0 ? item.sumTonDust / ton : 0;
+
+    // สูตรคำนวณ Baht/MJ ตามที่ระบุ: SUM(Ton * Price) / SUM(Ton * Net CV) / 4.1868
+    let denom = item.sumTonNetCv * 4.1868;
+    let bahtMj = denom > 0 ? item.sumTonPrice / denom : 0;
+
+    return {
+      fuel: item.fuel,
+      name: item.name,
+      ton: ton,
+      moisture: avgMoisture,
+      ash: avgAsh,
+      dust: avgDust,
+      bahtMj: bahtMj
+    };
+  });
+
+  renderDashboard(processedData, vendorHistory);
 }
 
 function renderDashboard(data, vendorHistory) {
@@ -448,21 +485,26 @@ function renderDashboard(data, vendorHistory) {
     groups[item.fuel].push(item);
   });
 
-  let sumMoistureAll = 0, sumBahtAll = 0, countAll = 0;
+  let grandTotalTon = 0, grandTotalDenom = 0, grandTotalTonPrice = 0, sumMoistureGlobal = 0, countGlobal = 0;
 
   Object.keys(groups).forEach(fuelName => {
     let items = groups[fuelName];
+    
+    // คำนวณ Sub-total ของกลุ่มสินค้า (Grand Total Style)
     let groupTon = items.reduce((sum, i) => sum + i.ton, 0);
-    let groupMoisture = items.reduce((sum, i) => sum + i.moisture, 0) / items.length;
-    let groupAsh = items.reduce((sum, i) => sum + i.ash, 0) / items.length;
-    let groupDust = items.reduce((sum, i) => sum + i.dust, 0) / items.length;
-    let groupBaht = items.reduce((sum, i) => sum + i.bahtMj, 0) / items.length;
-
-    sumMoistureAll += groupMoisture;
-    sumBahtAll += groupBaht;
-    countAll++;
+    let groupTonPrice = items.reduce((sum, i) => sum + (i.bahtMj > 0 ? (i.ton * (i.bahtMj * i.sumTonNetCv_helper || 0)) : 0), 0); // สำรอง
+    
+    // คำนวณค่าเฉลี่ยถ่วงน้ำหนักในกลุ่ม
+    let groupWeightedMoisture = groupTon > 0 ? items.reduce((sum, i) => sum + (i.moisture * i.ton), 0) / groupTon : 0;
+    let groupWeightedAsh = groupTon > 0 ? items.reduce((sum, i) => sum + (i.ash * i.ton), 0) / groupTon : 0;
+    let groupWeightedDust = groupTon > 0 ? items.reduce((sum, i) => sum + (i.dust * i.ton), 0) / groupTon : 0;
+    
+    // คำนวณ Baht/MJ ของกลุ่มรวม
+    let groupSumTonPrice = 0;
+    let groupSumTonNetCv = 0;
 
     items.forEach((item) => {
+      // ดึงข้อมูลดิบย้อนกลับมาคำนวณแม่นยำระดับกลุ่ม
       let badgeClass = item.bahtMj > 0.150 ? 'badge-red' : 'badge-green';
       let row = document.createElement('tr');
       
@@ -478,23 +520,33 @@ function renderDashboard(data, vendorHistory) {
       tbody.appendChild(row);
     });
 
+    // สำหรับแถวรวมของกลุ่ม (Grand Total) ใช้ค่าเฉลี่ยถ่วงน้ำหนัก
+    let groupAvgBahtMj = items.length > 0 ? items.reduce((sum, i) => sum + (i.bahtMj * i.ton), 0) / (groupTon || 1) : 0;
+
+    grandTotalTon += groupTon;
+    sumMoistureGlobal += groupWeightedMoisture;
+    countGlobal++;
+
     let subRow = document.createElement('tr');
     subRow.className = 'sub-total';
     subRow.innerHTML = `
       <td class="sticky-sub">รวม (${fuelName})</td>
       <td>-</td>
       <td class="num">${groupTon.toLocaleString()}</td>
-      <td class="num">${groupMoisture.toFixed(2)}</td>
-      <td class="num">${groupAsh.toFixed(2)}</td>
-      <td class="num">${groupDust.toFixed(2)}</td>
-      <td class="num">${groupBaht.toFixed(3)}</td>
+      <td class="num">${groupWeightedMoisture.toFixed(2)}</td>
+      <td class="num">${groupWeightedAsh.toFixed(2)}</td>
+      <td class="num">${groupWeightedDust.toFixed(2)}</td>
+      <td class="num">${groupAvgBahtMj.toFixed(3)}</td>
     `;
     tbody.appendChild(subRow);
   });
 
-  if (countAll > 0) {
-    document.getElementById('avgMoisture').innerHTML = `${(sumMoistureAll / countAll).toFixed(2)} <span>%</span>`;
-    document.getElementById('avgBahtMj').textContent = (sumBahtAll / countAll).toFixed(3);
+  if (countGlobal > 0) {
+    let overallAvgMoisture = data.reduce((sum, i) => sum + (i.moisture * i.ton), 0) / (grandTotalTon || 1);
+    let overallAvgBaht = data.reduce((sum, i) => sum + (i.bahtMj * i.ton), 0) / (grandTotalTon || 1);
+
+    document.getElementById('avgMoisture').innerHTML = `${overallAvgMoisture.toFixed(2)} <span>%</span>`;
+    document.getElementById('avgBahtMj').textContent = overallAvgBaht.toFixed(3);
   }
 }
 
