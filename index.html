@@ -19,7 +19,7 @@
     --shadow: 0 6px 24px rgba(82, 121, 111, 0.06);
   }
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: 'Nunito', 'Mitr', sans-serif; background: var(--bg); color: var(--text); padding: 24px; font-size: 15px; }
+  body { margin: 0; font-family: 'Nunito', 'Mitr', sans-serif; background: var(--bg); color: var(--text); padding: 24px; font-size: 14px; }
   .wrap { max-width: 1400px; margin: 0 auto; }
 
   /* Header */
@@ -28,37 +28,37 @@
     justify-content: space-between;
     align-items: center;
     background: var(--card);
-    padding: 18px 26px;
+    padding: 16px 24px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    margin-bottom: 18px;
+    margin-bottom: 16px;
     border: 1px solid var(--border);
   }
-  .brand-title h1 { margin: 0; font-size: 22px; color: var(--text); font-weight: 700; }
+  .brand-title h1 { margin: 0; font-size: 20px; color: var(--text); font-weight: 700; }
   .brand-title h1 span { color: var(--primary); }
-  .brand-title p { margin: 4px 0 0 0; font-size: 14px; color: var(--muted); }
+  .brand-title p { margin: 4px 0 0 0; font-size: 13px; color: var(--muted); }
   
   .update-badge {
     background: var(--primary-light);
     border: 1px solid var(--border);
-    padding: 8px 16px;
-    border-radius: 12px;
-    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 12px;
     color: var(--muted);
     text-align: right;
   }
-  .update-badge b { color: var(--primary); display: block; font-size: 14px; }
+  .update-badge b { color: var(--primary); display: block; font-size: 13px; }
 
   /* Filter Bar */
   .filter-bar {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 14px;
+    gap: 12px;
     background: var(--card);
-    padding: 16px 20px;
+    padding: 14px 18px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    margin-bottom: 18px;
+    margin-bottom: 16px;
     border: 1px solid var(--border);
   }
   .filter-item {
@@ -67,16 +67,16 @@
     gap: 8px;
     background: #FAFCFB;
     border: 1px solid var(--border);
-    padding: 10px 14px;
-    border-radius: 12px;
-    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 13px;
     color: var(--muted);
   }
   .filter-item select, .filter-item input {
     border: none;
     background: transparent;
     font-family: 'Nunito', 'Mitr', sans-serif;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--text);
     width: 100%;
     outline: none;
@@ -85,60 +85,60 @@
   /* Main Layout */
   .main-grid {
     display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 18px;
+    grid-template-columns: 280px 1fr;
+    gap: 16px;
   }
   @media(max-width: 1000px) { .main-grid { grid-template-columns: 1fr; } }
 
   /* Left Cards */
-  .left-cards { display: flex; flex-direction: column; gap: 14px; }
+  .left-cards { display: flex; flex-direction: column; gap: 12px; }
   .stat-card {
     background: var(--card);
     border-radius: var(--radius);
-    padding: 18px 22px;
+    padding: 16px 20px;
     box-shadow: var(--shadow);
     border: 1px solid var(--border);
     position: relative;
     overflow: hidden;
   }
   .stat-card::after {
-    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--primary);
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--primary);
   }
-  .stat-card h4 { margin: 0 0 6px 0; font-size: 14px; color: var(--muted); font-weight: 600; display: flex; align-items: center; gap: 6px; }
-  .stat-value { font-size: 28px; font-weight: 700; color: var(--text); }
-  .stat-value span { font-size: 16px; font-weight: 600; color: var(--muted); }
+  .stat-card h4 { margin: 0 0 4px 0; font-size: 13px; color: var(--muted); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+  .stat-value { font-size: 24px; font-weight: 700; color: var(--text); }
+  .stat-value span { font-size: 15px; font-weight: 600; color: var(--muted); }
 
   /* AI Smart Analysis Card */
   .ai-analysis-card {
     background: linear-gradient(135deg, #E8F1EE, #D8EAE5);
     border-radius: var(--radius);
-    padding: 18px 22px;
+    padding: 16px 20px;
     box-shadow: var(--shadow);
     border: 1px solid #BFE0D4;
   }
-  .ai-analysis-card h4 { margin: 0 0 8px 0; font-size: 15px; color: #2F5243; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-  .ai-analysis-content { font-size: 13.5px; color: #354F44; line-height: 1.6; max-height: 220px; overflow-y: auto; }
-  .alert-item { background: rgba(255,255,255,0.7); padding: 8px 10px; border-radius: 8px; margin-bottom: 6px; border-left: 4px solid var(--accent); }
+  .ai-analysis-card h4 { margin: 0 0 6px 0; font-size: 14px; color: #2F5243; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .ai-analysis-content { font-size: 13px; color: #354F44; line-height: 1.5; max-height: 200px; overflow-y: auto; }
+  .alert-item { background: rgba(255,255,255,0.7); padding: 6px 8px; border-radius: 6px; margin-bottom: 4px; border-left: 3px solid var(--accent); }
 
-  /* Right Table Card */
+  /* Right Table Card (Compact) */
   .table-card {
     background: var(--card);
     border-radius: var(--radius);
-    padding: 22px;
+    padding: 18px;
     box-shadow: var(--shadow);
     border: 1px solid var(--border);
   }
-  .table-card h3 { margin: 0 0 16px 0; font-size: 17px; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .table-card h3 { margin: 0 0 14px 0; font-size: 15px; color: var(--text); font-weight: 700; display: flex; align-items: center; gap: 6px; }
   
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th { text-align: left; padding: 14px 12px; color: var(--muted); font-weight: 600; border-bottom: 2px solid var(--border); background: #FAFCFB; white-space: nowrap; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 10px 10px; color: var(--muted); font-weight: 600; border-bottom: 2px solid var(--border); background: #FAFCFB; white-space: nowrap; }
   th.num, td.num { text-align: right; }
-  td { padding: 14px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
   
   tr.sub-total td { background: #FAFCFB; font-weight: 700; color: var(--text); border-bottom: 2px solid var(--border); }
   
-  .badge-green { background: #E2F0D9; color: #385723; padding: 5px 12px; border-radius: 8px; font-weight: 700; display: inline-block; text-align: right; }
-  .badge-red { background: #FCE4D6; color: #C65911; padding: 5px 12px; border-radius: 8px; font-weight: 700; display: inline-block; text-align: right; }
+  .badge-green { background: #E2F0D9; color: #385723; padding: 3px 8px; border-radius: 6px; font-weight: 700; display: inline-block; text-align: right; }
+  .badge-red { background: #FCE4D6; color: #C65911; padding: 3px 8px; border-radius: 6px; font-weight: 700; display: inline-block; text-align: right; }
 </style>
 </head>
 <body>
@@ -211,7 +211,7 @@
         <table>
           <thead>
             <tr>
-              <th>กลุ่มชพ.</th>
+              <th style="width: 140px;">กลุ่มชพ.</th>
               <th>ชื่อลูกค้า</th>
               <th class="num">Ton</th>
               <th class="num">%TM by weight</th>
@@ -365,7 +365,7 @@ function renderDashboard(data, vendorHistory) {
   tbody.innerHTML = '';
 
   if (data.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted);">🌱 ไม่พบข้อมูลตามเงื่อนไขที่เลือก</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:25px;color:var(--muted);">🌱 ไม่พบข้อมูลตามเงื่อนไขที่เลือก</td></tr>`;
     document.getElementById('avgMoisture').innerHTML = `0.00 <span>%</span>`;
     document.getElementById('avgBahtMj').textContent = `0.000`;
     document.getElementById('aiMoistureAlerts').innerHTML = `💡 ไม่พบข้อมูลเพียงพอสำหรับการวิเคราะห์`;
@@ -381,13 +381,13 @@ function renderDashboard(data, vendorHistory) {
       let lastM = records[records.length - 1].moisture;
       
       if (lastM - firstM >= 3.0) {
-        warningHtml += `<div class="alert-item">⚠️ <b>${vendor}</b><br>ความชื้นขยับสูงขึ้น (${firstM.toFixed(1)}% ➔ ${lastM.toFixed(1)}%) ควรเฝ้าระวัง</div>`;
+        warningHtml += `<div class="alert-item">⚠️ <b>${vendor}</b><br>ความชื้นสูงขึ้น (${firstM.toFixed(1)}% ➔ ${lastM.toFixed(1)}%)</div>`;
       }
     }
   });
 
   if (!warningHtml) {
-    warningHtml = `<div style="color:var(--primary);font-weight:600;">✨ ปกติ: ยังไม่พบผู้ขายที่มีแนวโน้มความชื้นสูงขึ้นผิดปกติ</div>`;
+    warningHtml = `<div style="color:var(--primary);font-weight:600;">✨ ปกติ: ยังไม่พบผู้ขายความชื้นพุ่งสูงขึ้น</div>`;
   }
   document.getElementById('aiMoistureAlerts').innerHTML = warningHtml;
 
@@ -411,12 +411,18 @@ function renderDashboard(data, vendorHistory) {
     sumBahtAll += groupBaht;
     countAll++;
 
-    // แสดงชื่อสินค้าทุกบรรทัดของรายการผู้ขาย
-    items.forEach((item) => {
+    // แสดงชื่อสินค้าไว้ที่บรรทัดแรกของกลุ่ม (ใช้ rowspan) และเว้นว่างในบรรทัดถัดไป
+    items.forEach((item, idx) => {
       let badgeClass = item.bahtMj > 0.150 ? 'badge-red' : 'badge-green';
       let row = document.createElement('tr');
+      
+      let fuelCellHtml = '';
+      if (idx === 0) {
+        fuelCellHtml = `<td rowspan="${items.length + 1}" style="vertical-align: top; font-weight: 700; background: #FAFCFB; border-right: 1px solid var(--border);">${fuelName}</td>`;
+      }
+
       row.innerHTML = `
-        <td><b>${item.fuel}</b></td>
+        ${fuelCellHtml}
         <td>${item.name}</td>
         <td class="num">${item.ton.toLocaleString()}</td>
         <td class="num">${item.moisture.toFixed(2)}</td>
@@ -431,7 +437,6 @@ function renderDashboard(data, vendorHistory) {
     subRow.className = 'sub-total';
     subRow.innerHTML = `
       <td>รวม (${fuelName})</td>
-      <td>-</td>
       <td class="num">${groupTon.toLocaleString()}</td>
       <td class="num">${groupMoisture.toFixed(2)}</td>
       <td class="num">${groupAsh.toFixed(2)}</td>
