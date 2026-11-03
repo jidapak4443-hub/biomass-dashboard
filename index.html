@@ -3,66 +3,301 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Test Dashboard</title>
+<title>Biomass Strategic Command Center & AI Advisor</title>
 <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-  body{font-family:'Mitr',sans-serif;background:#F4F7F4;padding:20px;color:#2C3E35;}
-  .card{background:#fff;padding:20px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.05);margin-bottom:15px;}
-  table{width:100%;border-collapse:collapse;}
-  th, td{padding:10px;border-bottom:1px solid #ddd;text-align:left;}
+  :root{
+    --bg:#F4F7F4; --card:#FFFFFF; --primary:#6AAE78; --primary-dark:#4A8B56;
+    --text:#2C3E35; --muted:#7E8F84; --border:#D8E2D6;
+    --green-bg:#E7F6EA; --green-text:#2F9E52;
+    --yellow-bg:#FFF6DC; --yellow-text:#C9972A;
+    --red-bg:#FDEAEA; --red-text:#D9534F;
+    --blue-bg:#EBF3FD; --blue-text:#2B6CB0;
+    --radius:16px; --shadow:0 4px 20px rgba(0,0,0,0.04);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Mitr',sans-serif;background:var(--bg);color:var(--text);padding:16px;}
+  .wrap{max-width:1300px;margin:0 auto;}
+  .ai-advisor-strip{background:linear-gradient(135deg, #1B3B2B, #2C5E43);color:white;border-radius:var(--radius);padding:18px 22px;margin-bottom:16px;box-shadow:var(--shadow);border-left:6px solid #48BB78;}
+  .ai-header{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:#9AE6B4;margin-bottom:8px;}
+  .ai-body{font-size:14px;line-height:1.5;color:#E2E8F0;}
+  .plant-tabs{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .plant-tab{flex:1;min-width:140px;padding:12px;border-radius:var(--radius);border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:'Mitr',sans-serif;font-size:14px;font-weight:600;cursor:pointer;text-align:center;transition:.2s;box-shadow:var(--shadow);}
+  .plant-tab.active{background:var(--primary-dark);color:white;border-color:var(--primary-dark);}
+  .filter-bar{display:flex;flex-wrap:wrap;gap:12px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px 18px;margin-bottom:14px;align-items:center;}
+  .filter-bar label{font-size:13px;color:var(--muted);}
+  .filter-bar input[type="date"]{padding:7px 10px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:'Mitr',sans-serif;font-size:13px;}
+  .btn{border:none;padding:7px 14px;border-radius:10px;font-family:'Mitr',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:.2s;}
+  .btn-primary{background:var(--primary-dark);color:white;}
+  .btn-ghost{background:var(--bg);color:var(--muted);border:1px solid var(--border);}
+  .fuel-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;}
+  .fuel-tab{padding:8px 14px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:'Mitr',sans-serif;font-size:13px;cursor:pointer;white-space:nowrap;transition:.2s;font-weight:500;}
+  .fuel-tab.active{background:var(--text);color:white;border-color:var(--text);}
+  .grid-analytics{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;margin-bottom:14px;}
+  @media(max-width:900px){.grid-analytics{grid-template-columns:1fr;}}
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;}
+  .card h3{margin:0 0 12px;font-size:14px;color:var(--primary-dark);display:flex;align-items:center;gap:6px;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{text-align:left;padding:10px;color:var(--muted);font-weight:500;border-bottom:2px solid var(--border);white-space:nowrap;}
   th.num, td.num{text-align:right;}
+  td{padding:10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+  tr.vendor-row{cursor:pointer;transition:.15s;}
+  tr.vendor-row:hover{background:rgba(106,170,120,0.08);}
+  .tier-badge{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+  .tier-a{background:#E7F6EA;color:#2F9E52;border:1px solid #2F9E52;}
+  .tier-b{background:#EBF3FD;color:#2B6CB0;border:1px solid #2B6CB0;}
+  .tier-c{background:#FFF6DC;color:#C9972A;border:1px solid #C9972A;}
+  .tier-d{background:#FDEAEA;color:#D9534F;border:1px solid #D9534F;}
+  .chart-container{position:relative;height:260px;width:100%;}
 </style>
 </head>
 <body>
-<div class="card">
-  <h2>🧪 โหมดทดสอบระบบ (จำลองข้อมูล)</h2>
-  <div id="plantTabs" style="margin-bottom:15px;"></div>
-  <table>
-    <thead>
-      <tr>
-        <th>ชื่อผู้จัดจำหน่าย</th>
-        <th class="num">น้ำหนัก (Ton)</th>
-        <th class="num">Net CV</th>
-        <th class="num">ราคา/ตัน</th>
-        <th class="num">Baht/MJ</th>
-      </tr>
-    </thead>
-    <tbody id="vendorTableBody"></tbody>
-  </table>
+<div class="wrap">
+  <div class="ai-advisor-strip">
+    <div class="ai-header">🤖 AI Biomass Procurement Advisor: ข้อเสนอแนะเชิงกลยุทธ์</div>
+    <div class="ai-body"><span id="aiRecommendationText">💡 กำลังประมวลผลข้อมูล...</span></div>
+  </div>
+  <div class="plant-tabs" id="plantTabs"></div>
+  <div class="filter-bar">
+    <div><label>📅 ตั้งแต่:</label><input type="date" id="startDate" value="2026-09-01"></div>
+    <div><label>ถึง:</label><input type="date" id="endDate" value="2026-10-31"></div>
+    <button class="btn btn-primary" onclick="renderAll()">🔍 ประเมิน</button>
+    <button class="btn btn-ghost" onclick="resetFilter()">↺ รีเซ็ต</button>
+  </div>
+  <div class="fuel-tabs" id="fuelTabs"></div>
+  <div class="grid-analytics">
+    <div class="card">
+      <h3>📈 Net CV ARB vs. ราคาต่อตัน</h3>
+      <div class="chart-container"><canvas id="scatterChart"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>⚠️ Baht/MJ Variance & Smart Alert</h3>
+      <div id="alertBox" style="font-size:13px;display:flex;flex-direction:column;gap:8px;max-height:240px;overflow-y:auto;"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <h3 style="margin:0;">📋 จัดอันดับและแบ่งเกรดผู้จัดจำหน่าย (Vendor Tiering)</h3>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:50px;">เกรด</th>
+            <th>ชื่อลูกค้า / ผู้จัดจำหน่าย</th>
+            <th class="num">น้ำหนักรวม (Ton)</th>
+            <th class="num">ความชื้น (%TM)</th>
+            <th class="num">Net CV (kcal/kg)</th>
+            <th class="num">ราคา/ตัน</th>
+            <th class="num">Baht/MJ</th>
+            <th style="text-align:center;">สถานะประเมิน</th>
+          </tr>
+        </thead>
+        <tbody id="vendorTableBody"></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <script>
-// ข้อมูลจำลองเพื่อเช็คว่าหน้าเว็บแสดงผลปกติไหม
-const mockData = {
-  "โรงไฟฟ้า A": {
-    "แกลบ": [
-      { name: "บริษัท สมชาย ชีวมวล จำกัด", ton: 1200, netCv: 3200, price: 950 },
-      { name: "สหกรณ์เกษตรกรไทย", ton: 850, netCv: 3100, price: 920 }
-    ]
-  }
-};
+let database = {};
+let currentPlant = '';
+let currentFuel = '';
+let scatterChartInstance = null;
 
-function initTest() {
+async function loadData() {
+  try {
+    let response = await fetch('./data.json?v=' + new Date().getTime());
+    let rawData = await response.json();
+    
+    let grouped = {};
+
+    rawData.forEach(row => {
+      let keys = Object.keys(row);
+      let getVal = (keywords) => {
+        let foundKey = keys.find(k => keywords.some(kw => k.trim().toLowerCase().includes(kw.toLowerCase())));
+        return foundKey ? row[foundKey] : '';
+      };
+
+      let plant = String(getVal(['โรงไฟฟ้า', 'Plant']) || 'โรงไฟฟ้าหลัก').trim();
+      let fuel = String(getVal(['สินค้า', 'Fuel', 'Type']) || 'รวมเชื้อเพลิง').trim();
+      let name = String(getVal(['ชื่อลูกค้า', 'Vendor', 'Customer', 'Name']) || 'ไม่ระบุชื่อ').trim();
+      
+      let netCv = parseFloat(getVal(['Net CV', 'kcal'])) || 0;
+      let price = parseFloat(getVal(['Price', 'ราคา'])) || 0;
+      let moisture = parseFloat(getVal(['%TM', 'ความชื้น', 'Moisture'])) || 0;
+      let ton = parseFloat(getVal(['นน.สุทธิ', 'Ton', 'Weight', 'Net'])) || 0;
+
+      if (!plant || !name) return;
+
+      if (!grouped[plant]) grouped[plant] = {};
+      if (!grouped[plant][fuel]) grouped[plant][fuel] = {};
+      
+      if (!grouped[plant][fuel][name]) {
+        grouped[plant][fuel][name] = { name: name, totalTon: 0, sumMoisture: 0, sumNetCv: 0, sumPrice: 0, count: 0 };
+      }
+      
+      let v = grouped[plant][fuel][name];
+      v.totalTon += ton;
+      v.sumMoisture += moisture;
+      v.sumNetCv += netCv;
+      v.sumPrice += price;
+      v.count += 1;
+    });
+
+    database = {};
+    Object.keys(grouped).forEach(p => {
+      database[p] = {};
+      Object.keys(grouped[p]).forEach(f => {
+        database[p][f] = Object.values(grouped[p][f]).map(item => {
+          let avgMoisture = item.count > 0 ? (item.sumMoisture / item.count) : 0;
+          let avgNetCv = item.count > 0 ? (item.sumNetCv / item.count) : 0;
+          let avgPrice = item.count > 0 ? (item.sumPrice / item.count) : 0;
+          let bahtMj = avgNetCv > 0 ? parseFloat((avgPrice / avgNetCv).toFixed(4)) : 0;
+          
+          return {
+            name: item.name,
+            ton: item.totalTon,
+            moisture: parseFloat(avgMoisture.toFixed(2)),
+            netCv: Math.round(avgNetCv),
+            price: Math.round(avgPrice),
+            bahtMj: bahtMj,
+            tier: 'B'
+          };
+        });
+      });
+    });
+
+    const plantTabsContainer = document.getElementById('plantTabs');
+    plantTabsContainer.innerHTML = '';
+    const plants = Object.keys(database);
+    
+    if (plants.length > 0) {
+      currentPlant = plants[0];
+      plants.forEach(p => {
+        let btn = document.createElement('button');
+        btn.className = `plant-tab ${p === currentPlant ? 'active' : ''}`;
+        btn.textContent = `⚡ ${p}`;
+        btn.onclick = () => switchPlant(p);
+        plantTabsContainer.appendChild(btn);
+      });
+      switchPlant(currentPlant);
+    } else {
+      document.getElementById('aiRecommendationText').innerHTML = "⚠️ ไม่พบข้อมูลโครงสร้างที่ตรงกันใน data.json";
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    document.getElementById('aiRecommendationText').innerHTML = "⚠️ โหลดข้อมูลไม่สำเร็จ";
+  }
+}
+
+function switchPlant(plantName) {
+  currentPlant = plantName;
+  document.querySelectorAll('.plant-tab').forEach(t => {
+    t.classList.remove('active');
+    if(t.textContent.includes(plantName)) t.classList.add('active');
+  });
+  
+  const fuels = Object.keys(database[plantName] || {});
+  const fuelTabsContainer = document.getElementById('fuelTabs');
+  fuelTabsContainer.innerHTML = '';
+
+  if(fuels.length > 0) {
+    currentFuel = fuels[0];
+    fuels.forEach(fuel => {
+      let btn = document.createElement('button');
+      btn.className = `fuel-tab ${fuel === currentFuel ? 'active' : ''}`;
+      btn.textContent = fuel;
+      btn.onclick = () => switchFuel(fuel);
+      fuelTabsContainer.appendChild(btn);
+    });
+    renderAll();
+  }
+}
+
+function switchFuel(fuelName) {
+  currentFuel = fuelName;
+  document.querySelectorAll('.fuel-tab').forEach(t => {
+    t.classList.remove('active');
+    if(t.textContent === fuelName) t.classList.add('active');
+  });
+  renderAll();
+}
+
+function renderAll() {
+  const vendors = (database[currentPlant] && database[currentPlant][currentFuel]) || [];
   const tbody = document.getElementById('vendorTableBody');
   tbody.innerHTML = '';
+
+  if(vendors.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted);">ไม่พบข้อมูลสำหรับเงื่อนไขนี้</td></tr>`;
+    document.getElementById('alertBox').innerHTML = `<div style="color:var(--muted);text-align:center;">ไม่มีข้อมูลแจ้งเตือน</div>`;
+    return;
+  }
+
+  vendors.sort((a,b) => a.bahtMj - b.bahtMj);
   
-  mockData["โรงไฟฟ้า A"]["แกลบ"].forEach(v => {
-    let bahtMj = (v.price / v.netCv).toFixed(4);
+  let totalB = vendors.reduce((sum, v) => sum + v.bahtMj, 0);
+  let avgBahtMj = vendors.length > 0 ? totalB / vendors.length : 0;
+
+  vendors.forEach((v, index) => {
+    if(index === 0) v.tier = 'A';
+    else if(v.bahtMj <= avgBahtMj * 1.05) v.tier = 'B';
+    else if(v.bahtMj <= avgBahtMj * 1.15) v.tier = 'C';
+    else v.tier = 'D';
+
+    let tierClass = `tier-${v.tier.toLowerCase()}`;
     let row = document.createElement('tr');
+    row.className = 'vendor-row';
     row.innerHTML = `
+      <td><span class="tier-badge ${tierClass}">${v.tier}</span></td>
       <td><strong>${v.name}</strong></td>
       <td class="num">${v.ton.toLocaleString()}</td>
+      <td class="num">${v.moisture}%</td>
       <td class="num">${v.netCv.toLocaleString()}</td>
       <td class="num">${v.price.toLocaleString()}</td>
-      <td class="num" style="font-weight:700;color:#2F9E52;">${bahtMj}</td>
+      <td class="num" style="font-weight:700;">${v.bahtMj}</td>
+      <td style="text-align:center;"><span style="color:var(--green-text);font-weight:600;">ปกติ</span></td>
     `;
     tbody.appendChild(row);
   });
-  document.getElementById('plantTabs').innerHTML = '<button style="padding:8px 16px;background:#4A8B56;color:#fff;border:none;border-radius:8px;">⚡ โรงไฟฟ้า A (ทดสอบ)</button>';
+
+  document.getElementById('aiRecommendationText').innerHTML = `💡 สำหรับโรงไฟฟ้า <b>${currentPlant</b> ประเภท <b>${currentFuel}</b> ผู้จัดจำหน่ายที่คุ้มค่าที่สุดคือ <b>${vendors[0].name}</b> (ต้นทุน ${vendors[0].bahtMj} Baht/MJ)`;
+  document.getElementById('alertBox').innerHTML = `<div style="background:var(--green-bg);color:var(--green-text);padding:10px 14px;border-radius:8px;">✅ วิเคราะห์ข้อมูลสำเร็จ ${vendors.length} รายการ</div>`;
+
+  renderChart(vendors);
 }
 
-initTest();
+function renderChart(vendors) {
+  const ctx = document.getElementById('scatterChart').getContext('2d');
+  if(scatterChartInstance) scatterChartInstance.destroy();
+
+  scatterChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: vendors.map(v => v.name),
+      datasets: [{
+        label: 'Baht/MJ',
+        data: vendors.map(v => v.bahtMj),
+        backgroundColor: '#4A8B56',
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: '#E2E8F0' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+function resetFilter() { renderAll(); }
+loadData();
 </script>
 </body>
 </html>
