@@ -263,7 +263,7 @@ function renderAll() {
     tbody.appendChild(row);
   });
 
-  document.getElementById('aiRecommendationText').innerHTML = `💡 สำหรับโรงไฟฟ้า <b>${currentPlant</b> ประเภท <b>${currentFuel}</b> ผู้จัดจำหน่ายที่คุ้มค่าที่สุดคือ <b>${vendors[0].name}</b> (ต้นทุน ${vendors[0].bahtMj} Baht/MJ)`;
+  document.getElementById('aiRecommendationText').innerHTML = `💡 สำหรับโรงไฟฟ้า <b>${currentPlant}</b> ประเภท <b>${currentFuel}</b> ผู้จัดจำหน่ายที่คุ้มค่าที่สุดคือ <b>${vendors[0].name}</b> (ต้นทุน ${vendors[0].bahtMj} Baht/MJ)`;
   document.getElementById('alertBox').innerHTML = `<div style="background:var(--green-bg);color:var(--green-text);padding:10px 14px;border-radius:8px;">✅ วิเคราะห์ข้อมูลสำเร็จ ${vendors.length} รายการ</div>`;
 
   renderChart(vendors);
